@@ -14,9 +14,14 @@ _autopair-get-pair() {
     esac
 }
 
+_autopair-p() {
+    [[ "$LBUFFER" =~ "(^|[ 	])$1\$" && "$RBUFFER" =~ "^$2(\$|[ 	])" ]]
+}
+
 autopair-insert() {
     local char=$(_autopair-get-pair $KEYS)
-    if [ "$LBUFFER" =~ "(^|[ 	])$" ] && [ "$RBUFFER" =~ "^($|[ 	])" ]; then
+    if _autopair-p;
+    then
         LBUFFER+="$KEYS"
         RBUFFER="$char$RBUFFER"
     else
@@ -26,9 +31,11 @@ autopair-insert() {
 
 autopair-delete() {
     local lchar="${LBUFFER: -1}"
+    local rchar="${RBUFFER:0:1}"
     local pair=$(_autopair-get-pair "$lchar")
-    if [ -n "$pair" ]; then
-        [ "${RBUFFER:0:1}" == "$pair" ] && zle delete-char
+    if [[ -n "$pair" && "$rchar" = "$pair" ]];
+    then
+        _autopair-p "$lchar" "$rchar" && zle delete-char
     fi
     zle backward-delete-char
 }
