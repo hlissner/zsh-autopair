@@ -15,7 +15,7 @@ _autopair-get-pair() {
 _autopair-p() {
     [ -n "$1" ] && local l="."
     [ -n "$2" ] && local r="."
-    if [[ "$LBUFFER" =~ "(^|[])}> 	])$l\$" && "$RBUFFER" =~ "^$r(\$|[])}> 	])" ]];
+    if [[ "$RBUFFER" =~ "^$r(\$|[])}> 	])" ]];
     then
         [[ -n "$1" && "${LBUFFER: -1}" != "$1" ]] && return 1
         [[ -n "$2" && "${RBUFFER:0:1}" != "$2" ]] && return 1
