@@ -11,12 +11,16 @@ Suggestions and PRs are welcome!
 Source `autopair.zsh` and bind the following keys:
 
 ```zsh
-bindkey '`' autopair-insert
-bindkey '"' autopair-insert
-bindkey "'" autopair-insert
+bindkey '`' autopair-insert-or-skip
+bindkey '"' autopair-insert-or-skip
+bindkey "'" autopair-insert-or-skip
 bindkey '(' autopair-insert
 bindkey '[' autopair-insert
 bindkey '{' autopair-insert
+
+bindkey ')' autopair-skip
+bindkey ']' autopair-skip
+bindkey '}' autopair-skip
 
 bindkey '^?' autopair-delete   # backspace
 ```
@@ -45,5 +49,4 @@ Type yo' heart out!
 
 ## TODO
 
-* More sophisticated balance-checks
-* Skip over balanced delimiters (e.g. `echo "|"` => <kbd>"</kbd> => `echo ""|`)
+* More sophisticated balance checks
