@@ -12,10 +12,11 @@ _autopair-get-pair() {
     esac
 }
 
+# TODO Better balance checks
 _autopair-p() {
     [ -n "$1" ] && local l="."
     [ -n "$2" ] && local r="."
-    if [[ "$RBUFFER" =~ "^$r(\$|[])}> 	])" ]];
+    if [[ "$LBUFFER" =~ "(^|[^${1:-[({}])$l\$" && "$RBUFFER" =~ "^$r(\$|[^a-zA-Z])" ]];
     then
         [[ -n "$1" && "${LBUFFER: -1}" != "$1" ]] && return 1
         [[ -n "$2" && "${RBUFFER:0:1}" != "$2" ]] && return 1
@@ -25,6 +26,7 @@ _autopair-p() {
     fi
 }
 
+# TODO Fix this clumsy logic
 _autopair-skip-p() {
     [ "${RBUFFER:0:1}" = "$2" ] && [ "${LBUFFER#*$1}" != "$LBUFFER" ] && [ "${RBUFFER#*$2}" != "$RBUFFER" ]
 }
@@ -48,7 +50,7 @@ autopair-insert-or-skip() {
 }
 
 autopair-skip() {
-    if [[ "${RBUFFER:0:1}" = "$KEYS" && "$RBUFFER" =~ '^.($|[ 	])' ]];
+    if [[ "${RBUFFER:0:1}" = "$KEYS" && "$RBUFFER" =~ '^.($|[^a-zA-Z])' ]];
     then
         zle forward-char
     else
