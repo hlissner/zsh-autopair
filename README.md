@@ -1,10 +1,10 @@
 # zsh-autopair
 
-Auto-close matching delimiters in ZSH (and automatic pair deletion on backspace).
+A simple plugin that auto-closes and deletes matching delimiters in ZSH.
 
 e.g. `echo |` => <kbd>"</kbd> => `echo "|"`
 
-Suggestions and PRs are welcome!
+Disclaimer: I'm no shell guru, suggestions and PRs are welcome!
 
 ## Install
 
