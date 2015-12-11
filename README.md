@@ -2,28 +2,14 @@
 
 A simple plugin that auto-closes and deletes matching delimiters in ZSH.
 
-e.g. `echo |` => <kbd>"</kbd> => `echo "|"`
+e.g. 
+* `echo |` => <kbd>"</kbd> => `echo "|"`
+* `rm -f *.|` => <kbd>{</kbd> => `rm -f *.{|}`
+* `git commit -m "|"` => <kbd>backspace</kbd> => `git commit -m |`
 
 Disclaimer: I'm no shell guru, suggestions and PRs are welcome!
 
 ## Install
-
-Source `autopair.zsh` and bind the following keys:
-
-```zsh
-bindkey '`' autopair-insert-or-skip
-bindkey '"' autopair-insert-or-skip
-bindkey "'" autopair-insert-or-skip
-bindkey '(' autopair-insert
-bindkey '[' autopair-insert
-bindkey '{' autopair-insert
-
-bindkey ')' autopair-skip
-bindkey ']' autopair-skip
-bindkey '}' autopair-skip
-
-bindkey '^?' autopair-delete   # backspace
-```
 
 ### Antigen
 
@@ -45,8 +31,21 @@ fi
 
 ## Usage
 
-Type yo' heart out!
+Bind the following:
 
-## TODO
+```zsh
+bindkey '`' autopair-insert-or-skip
+bindkey '"' autopair-insert-or-skip
+bindkey "'" autopair-insert-or-skip
+bindkey '(' autopair-insert
+bindkey '[' autopair-insert
+bindkey '{' autopair-insert
 
-* More sophisticated balance checks
+bindkey ')' autopair-skip
+bindkey ']' autopair-skip
+bindkey '}' autopair-skip
+
+bindkey '^?' autopair-delete   # backspace
+```
+
+Then type your heart out!

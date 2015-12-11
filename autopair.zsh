@@ -1,5 +1,7 @@
 # A widget that auto-inserts matching pairs in ZSH.
 
+# TODO Clean up!
+
 _autopair-get-pair() {
     case "$1" in
         '"') echo -n '"' ;;
@@ -12,23 +14,65 @@ _autopair-get-pair() {
     esac
 }
 
-# TODO Better balance checks
-_autopair-p() {
-    [ -n "$1" ] && local l="."
-    [ -n "$2" ] && local r="."
-    if [[ "$LBUFFER" =~ "(^|[^${1:-[({}])$l\$" && "$RBUFFER" =~ "^$r(\$|[^a-zA-Z])" ]];
-    then
-        [[ -n "$1" && "${LBUFFER: -1}" != "$1" ]] && return 1
-        [[ -n "$2" && "${RBUFFER:0:1}" != "$2" ]] && return 1
-        return 0
-    else
-        return 1
-    fi
+_autopair-get-other-pair() {
+    case "$1" in
+        ')') echo -n '(' ;;
+        ']') echo -n '[' ;;
+        '}') echo -n '{' ;;
+        *) echo -n "" ;;
+    esac
 }
 
-# TODO Fix this clumsy logic
+_autopair-balanced-p() {
+    if [ "$1" = "$2" ]; then
+        local l=$(_autopair-count "$LBUFFER" "$1")
+        local r=$(_autopair-count "$RBUFFER" "$2")
+    else
+        local l=$(_autopair-count "$BUFFER" "$1")
+        local r=$(_autopair-count "$BUFFER" "$2")
+    fi
+    [ -n "$l" ] && [ -n "$r" ] && [ "$l" = "$r" ] && return 0
+    # [ "$1" = "$2" ] && local n="0" || local n="1"
+    [ $(( $l % 2 )) -eq 1 ] && [ $(( $r % 2 )) -eq 1 ] && return 0
+    return 1
+}
+
+_autopair-count() {
+    expr $(echo "$1" | fgrep -o "$2" - | wc -l ) + 0
+}
+
+_autopair-pair-p() {
+    local rchar=$(_autopair-get-pair $KEYS)
+
+    # Don't pair if pair doesn't exist
+    [ -z "$rchar" ] && return 1
+    # Pair if surrounded by boundaries
+    [ "$LBUFFER" =~ "(^|[ 	])$" ] && [ "$RBUFFER" =~ "^($|[ 	])" ] && return 0
+    # Don't pair if the delimiters are unbalanced
+    ! _autopair-balanced-p "$KEYS" "$rchar" && return 1
+    # Don't pair if next to the same delimiter (for quotes)
+    if [ "\\$KEYS" =~ '[^\[\{\(]' ]; then
+        [ "${RBUFFER:0:1}" = "$rchar" ] && return 1
+    fi
+
+    return 0
+}
+
 _autopair-skip-p() {
-    [ "${RBUFFER:0:1}" = "$2" ] && [ "${LBUFFER#*$1}" != "$LBUFFER" ] && [ "${RBUFFER#*$2}" != "$RBUFFER" ]
+    [ -z "$2" ] && return 1
+    if [ "${RBUFFER:0:1}" = "$2" ]; then
+        _autopair-balanced-p "$1" "$2" && return 0
+    fi
+    return 1
+}
+
+_autopair-delete-p() {
+    local lchar="${LBUFFER: -1}"
+    local rchar=$(_autopair-get-pair "$lchar")
+    if [ -n "$rchar" ] && [ "${RBUFFER:0:1}" = "$rchar" ]; then
+        _autopair-balanced-p "$lchar" "$rchar" && return 0
+    fi
+    return 1
 }
 
 _autopair-insert() {
@@ -37,20 +81,21 @@ _autopair-insert() {
 }
 
 autopair-insert-or-skip() {
-    local char=$(_autopair-get-pair $KEYS)
-    if _autopair-skip-p "$KEYS" "$char";
+    local rchar=$(_autopair-get-pair $KEYS)
+    if _autopair-skip-p "$KEYS" "$rchar";
     then
         zle forward-char
-    elif _autopair-p;
+    elif _autopair-pair-p;
     then
-        _autopair-insert "$KEYS" "$char"
+        _autopair-insert "$KEYS" "$rchar"
     else
         zle self-insert
     fi
 }
 
 autopair-skip() {
-    if [[ "${RBUFFER:0:1}" = "$KEYS" && "$RBUFFER" =~ '^.($|[^a-zA-Z])' ]];
+    local other=$(_autopair-get-other-pair "$KEYS")
+    if [ -n "$other" ] && _autopair-skip-p "$other" "$KEYS"
     then
         zle forward-char
     else
@@ -59,20 +104,17 @@ autopair-skip() {
 }
 
 autopair-insert() {
-    local char=$(_autopair-get-pair $KEYS)
-    if _autopair-p;
+    if _autopair-pair-p;
     then
-        _autopair-insert "$KEYS" "$char"
+        local rchar=$(_autopair-get-pair $KEYS)
+        _autopair-insert "$KEYS" "$rchar"
     else
         zle self-insert
     fi
 }
 
 autopair-delete() {
-    local lchar="${LBUFFER: -1}"
-    local rchar="${RBUFFER:0:1}"
-    local pair=$(_autopair-get-pair "$lchar")
-    if [ -n "$pair" ] && $(_autopair-p "$lchar" "$pair");
+    if _autopair-delete-p;
     then
         zle delete-char
     fi
