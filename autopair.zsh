@@ -33,7 +33,7 @@ _autopair-balanced-p() {
 }
 
 _autopair-count() {
-    expr $(echo "$1" | fgrep -o "$2" - | wc -l ) + 0
+    expr $(echo "$1" | fgrep -o "${2/-/\-}" - | wc -l ) + 0
 }
 
 _autopair-pair-p() {
