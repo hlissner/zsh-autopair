@@ -46,14 +46,18 @@ _autopair-pair-p() {
 
     # Don't pair if pair doesn't exist
     [ -z "$rchar" ] && return 1
+    # For quotes...
+    if [ "\\$KEYS" =~ '\\['"'"'`"]' ]; then
+        # Don't pair if next to alphanumerics
+        [ "$LBUFFER" =~ "[a-zA-Z0-9]$" ] || [ "$RBUFFER" =~ "^[a-zA-Z0-9]" ] && return 1
+    else # For braces
+        # Don't pair if next to the same starting delimiter
+        [ "${RBUFFER:0:1}" = "$KEYS" ] && return 1
+    fi
     # Pair if surrounded by boundaries
     [ "$LBUFFER" =~ "(^|[ 	])$" ] && [ "$RBUFFER" =~ "^($|[ 	])" ] && return 0
     # Don't pair if the delimiters are unbalanced
     ! _autopair-balanced-p "$KEYS" "$rchar" && return 1
-    # Don't pair if next to the same delimiter (for quotes)
-    if [ "\\$KEYS" =~ '[^\[\{\(]' ]; then
-        [ "${RBUFFER:0:1}" = "$rchar" ] && return 1
-    fi
 
     return 0
 }
