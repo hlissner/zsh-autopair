@@ -45,7 +45,7 @@ _autopair-pair-p() {
     if [[ "$KEYS" == (\'|\"|\`) ]]
     then
         # Don't pair if next to alphanumerics
-        [[ "$LBUFFER" =~ "[a-zA-Z0-9]$" || "$RBUFFER" =~ "^[a-zA-Z0-9]" ]] && return 1
+        [[ "$LBUFFER" =~ "[a-zA-Z0-9!]$" || "$RBUFFER" =~ "^[a-zA-Z0-9!]" ]] && return 1
     else # For braces
         # Don't pair if next to the same starting delimiter
         [[ $RBUFFER[1] == $KEYS ]] && return 1
