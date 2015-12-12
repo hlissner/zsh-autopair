@@ -3,14 +3,13 @@
 ![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)
 ![ZSH 5.0.2](https://img.shields.io/badge/zsh-v5.0.2-orange.svg?style=flat-square)
 
-A simple plugin that auto-closes and deletes matching delimiters in ZSH.
+A simple plugin that auto-closes, deletes and skips over matching delimiters in zsh
+intelligently. Hopefully.
 
 e.g. 
 * `echo |` => <kbd>"</kbd> => `echo "|"`
 * `rm -f *.|` => <kbd>{</kbd> => `rm -f *.{|}`
 * `git commit -m "|"` => <kbd>backspace</kbd> => `git commit -m |`
-
-Disclaimer: I'm no shell guru, suggestions and PRs are welcome!
 
 ## Install
 
