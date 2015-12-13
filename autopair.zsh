@@ -42,19 +42,24 @@ _autopair-pair-p() {
 
     # Don't pair if pair doesn't exist
     [[ -z "$rchar" ]] && return 1
+    # Don't pair if the delimiters are unbalanced
+    ! _autopair-balanced-p "$KEYS" "$rchar" && return 1
+    # Don't pair when in front of characters that likely signify the
+    # start of a string or path.
+    [[ $LBUFFER[-1] == '!' || "$RBUFFER" =~ "^[[{(<a-zA-Z0-9!$%/,.:?]" ]] && return 1
     # For quotes...
     if [[ "$KEYS" == (\'|\"|\`) ]]
     then
-        # Don't pair if next to alphanumerics
-        [[ "$LBUFFER" =~ "[a-zA-Z0-9!]$" || "$RBUFFER" =~ "^[a-zA-Z0-9!]" ]] && return 1
+        # Don't pair if after yourself
+        [[ $LBUFFER[-1] == "$KEYS" ]] && return 1
+        # Don't pair if next to alphanumerics or after closing brackets
+        [[ "$LBUFFER" =~ "[]a-zA-Z0-9)}]$" ]] && return 1
     else # For braces
         # Don't pair if next to the same starting delimiter
         [[ $RBUFFER[1] == $KEYS ]] && return 1
     fi
     # Pair if surrounded by boundaries
     [[ "$LBUFFER" =~ "(^|[ 	])$" && "$RBUFFER" =~ "^($|[ 	])" ]] && return 0
-    # Don't pair if the delimiters are unbalanced
-    ! _autopair-balanced-p "$KEYS" "$rchar" && return 1
 
     return 0
 }
