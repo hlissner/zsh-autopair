@@ -10,6 +10,7 @@ e.g.
 * `echo |` => <kbd>"</kbd> => `echo "|"`
 * `rm -f *.|` => <kbd>{</kbd> => `rm -f *.{|}`
 * `git commit -m "|"` => <kbd>backspace</kbd> => `git commit -m |`
+* `cat ./*.{py,rb|}` => <kbd>}</kbd> => `cat ./*.{py,rb}|`
 
 ## Install
 
