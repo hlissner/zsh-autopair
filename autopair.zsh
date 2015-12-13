@@ -12,6 +12,7 @@ _autopair-get-pair() {
              '(') echo -n ')' ;;
              '[') echo -n ']' ;;
              '{') echo -n '}' ;;
+             '<') echo -n '>' ;;
              *) echo -n "";;
          esac
     elif [[ -n "$2" ]]
@@ -19,6 +20,7 @@ _autopair-get-pair() {
              ')') echo -n '(' ;;
              ']') echo -n '[' ;;
              '}') echo -n '{' ;;
+             '>') echo -n '<' ;;
              *) echo -n "" ;;
          esac
     fi
