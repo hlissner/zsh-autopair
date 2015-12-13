@@ -30,8 +30,7 @@ _autopair-balanced-p() {
     local l=$(_autopair-count $([[ $1 == $2 ]] && echo "$LBUFFER" || echo "$BUFFER") "$1")
     local r=$(_autopair-count $([[ $1 == $2 ]] && echo "$RBUFFER" || echo "$BUFFER") "$2")
     [[ -z $1 || -z $r ]] && return 1
-    [[ $l == $r || $(( $l % 2 == 1 && $r % 2 == 1 )) ]] && return 0
-    return 1
+    [[ $l == $r || $(( ($l + $r) % 2 == 0 )) ]] && return 0
 }
 
 _autopair-count() {
