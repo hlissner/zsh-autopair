@@ -99,17 +99,17 @@ ap-can-delete-p() {
 
 autopair-self-insert() {
     LBUFFER+="$1$2"
-    zle .backward-char
+    zle backward-char
 }
 
 autopair-insert() {
     local rchar="$AUTOPAIR_PAIRS[$KEYS]"
     if [[ $KEYS == (\'|\"|\`) ]] && ap-can-skip-p "$KEYS" "$rchar"; then
-        zle .forward-char
+        zle forward-char
     elif ap-can-pair-p; then
         autopair-self-insert "$KEYS" "$rchar"
     else
-        zle .self-insert
+        zle self-insert
     fi
 }
 
@@ -126,7 +126,7 @@ autopair-close() {
 
 autopair-delete() {
     ap-can-delete-p && zle .delete-char
-    zle .backward-delete-char
+    zle backward-delete-char
 }
 
 # Initialization
