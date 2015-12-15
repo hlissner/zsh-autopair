@@ -97,10 +97,6 @@ ap-can-delete-p() {
     return 0
 }
 
-typeset -A AUTOPAIR_REVERSE_PAIRS
-for i in ${(@k)AUTOPAIR_PAIRS}; do AUTOPAIR_REVERSE_PAIRS["$AUTOPAIR_PAIRS[$i]"]="$i"; done
-typeset -r AUTOPAIR_REVERSE_PAIRS
-
 autopair-self-insert() {
     LBUFFER+="$1$2"
     zle .backward-char
@@ -118,9 +114,13 @@ autopair-insert() {
 }
 
 autopair-close() {
-    if ap-can-skip-p "$AUTOPAIR_REVERSE_PAIRS[$KEYS]" "$KEYS"
-    then zle .forward-char
-    else zle .self-insert
+    local lchar=
+    for i in ${(@k)AUTOPAIR_PAIRS}; do
+        [[ "$KEYS" == "$AUTOPAIR_PAIRS[$i]" ]] && lchar="$i" && break
+    done
+    if [[ -n "$lchar" ]] && ap-can-skip-p "$lchar" "$KEYS"
+    then zle forward-char
+    else zle self-insert
     fi
 }
 
