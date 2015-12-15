@@ -69,15 +69,15 @@ Feel free to tweak the following variables to adjust autopair's behavior:
   on the delimiter. These are their default values:
 
   ```zsh
-  AUTOPAIR_LBOUNDS[all]='.:/\!'
-  AUTOPAIR_LBOUNDS[quotes]=']})a-zA-Z0-9'
+  AUTOPAIR_LBOUNDS[all]='[.:/\!]'
+  AUTOPAIR_LBOUNDS[quotes]='[]})a-zA-Z0-9]'
   AUTOPAIR_LBOUNDS[braces]=''
   AUTOPAIR_LBOUNDS['"']='"'
   AUTOPAIR_LBOUNDS["'"]="'"
   AUTOPAIR_LBOUNDS['`']='`'
 
-  AUTOPAIR_RBOUNDS[all]='[{(<,.:?/%$!a-zA-Z0-9'
-  AUTOPAIR_RBOUNDS[quotes]='a-zA-Z0-9'
+  AUTOPAIR_RBOUNDS[all]='[[{(<,.:?/%$!a-zA-Z0-9]'
+  AUTOPAIR_RBOUNDS[quotes]='[a-zA-Z0-9]'
   AUTOPAIR_RBOUNDS[braces]=''
   ```
 
