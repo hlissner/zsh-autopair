@@ -81,10 +81,10 @@ Feel free to tweak the following variables to adjust autopair's behavior:
   AUTOPAIR_RBOUNDS[braces]=''
   ```
 
-  For example, if `$AUTOPAIR_LBOUNDS[braces]="a-zA-Z"`, then braces (`{([`) won't be
+  For example, if `$AUTOPAIR_LBOUNDS[braces]="[a-zA-Z]"`, then braces (`{([`) won't be
   autopaired if the cursor follows an alphabetical character.
 
-  Individual delimiters can be used too. Setting `$AUTOPAIR_RBOUNDS['{']="0-9"` will
+  Individual delimiters can be used too. Setting `$AUTOPAIR_RBOUNDS['{']="[0-9]"` will
   cause <kbd>{</kbd> specifically to not be autopaired when the cursor precedes a number.
 
 
