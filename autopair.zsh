@@ -44,12 +44,20 @@ ap-next-to-boundary-p() {
 ap-balanced-p() {
     local llen="${#LBUFFER//[^$1]}"
     local rlen="${#RBUFFER//[^$2]}"
-    if [[ -n "$llen" && -n "$rlen" ]]
-    then
-        (( $llen == $rlen )) || \
-            (( $llen % 2 == 0 && $rlen % 2 == 0 )) || \
-            (( $(($llen>$rlen?$llen - $rlen:$rlen - $llen)) == 0 ))
+    (( $rlen == 0 && $llen == 0 )) && return 0
+    if [[ "$1" == "$2" ]]; then
+        (( $llen == $rlen || ($llen + $rlen) % 2 == 0 )) && return 0
+    else
+        local l2len="${#LBUFFER//[^$2]}"
+        local r2len="${#RBUFFER//[^$1]}"
+        local ltotal=$(( $llen - $l2len ))
+        local rtotal=$(( $rlen - $r2len ))
+
+        (( $ltotal < 0 )) && ltotal=0
+        (( $ltotal < $rtotal )) && return 1
+        return 0
     fi
+    return 1
 }
 
 ap-can-pair-p() {
