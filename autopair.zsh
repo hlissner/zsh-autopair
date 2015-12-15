@@ -84,13 +84,17 @@ ap-can-pair-p() {
 }
 
 ap-can-skip-p() {
-    [[ -n "$2" && "$RBUFFER[1]" == "$2" ]] # && ap-balanced-p "$1" "$2"
+    ! [[ -n "$2" && "$RBUFFER[1]" == "$2" && "$LBUFFER[-1]" != '\' ]] && return 1
+    [[ "$1" == "$2" ]] && ! ap-balanced-p "$1" "$2" && return 1
+    return 0
 }
 
 ap-can-delete-p() {
     local lchar="$LBUFFER[-1]"
     local rchar="$AUTOPAIR_PAIRS[$lchar]"
-    [[ -n "$rchar" && "$RBUFFER[1]" == "$rchar" ]] && ap-balanced-p "$lchar" "$rchar"
+    ! [[ -n "$rchar" && "$RBUFFER[1]" == "$rchar" ]] && return 1
+    [[ "$lchar" == "$rchar" ]] && ! ap-balanced-p "$lchar" "$rchar" && return 1
+    return 0
 }
 
 typeset -A AUTOPAIR_REVERSE_PAIRS
