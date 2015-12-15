@@ -42,14 +42,16 @@ ap-next-to-boundary-p() {
 
 # If provided pair is balanced in the buffer
 ap-balanced-p() {
-    local llen="${#LBUFFER//[^$1]}"
-    local rlen="${#RBUFFER//[^$2]}"
+    local lbuf="${LBUFFER//\\$1}"
+    local rbuf="${RBUFFER//\\$2}"
+    local llen="${#lbuf//[^$1]}"
+    local rlen="${#rbuf//[^$2]}"
     (( $rlen == 0 && $llen == 0 )) && return 0
     if [[ "$1" == "$2" ]]; then
         (( $llen == $rlen || ($llen + $rlen) % 2 == 0 )) && return 0
     else
-        local l2len="${#LBUFFER//[^$2]}"
-        local r2len="${#RBUFFER//[^$1]}"
+        local l2len="${#lbuf//[^$2]}"
+        local r2len="${#rbuf//[^$1]}"
         local ltotal=$(( $llen - $l2len ))
         local rtotal=$(( $rlen - $r2len ))
 
