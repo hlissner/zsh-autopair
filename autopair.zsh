@@ -1,31 +1,40 @@
+#!/usr/bin/env zsh
+
 # A widget that auto-inserts matching pairs in ZSH.
 
-# Stops zsh-autopair from auto-binding keymaps
-AUTOPAIR_INHIBIT_INIT=
-AUTOPAIR_BETWEEN_WHITESPACE=
+AUTOPAIR_INHIBIT_INIT=${AUTOPAIR_INHIBIT_INIT:-}
+AUTOPAIR_BETWEEN_WHITESPACE=${AUTOPAIR_BETWEEN_WHITESPACE:-}
 
-typeset -A AUTOPAIR_PAIRS
+typeset -gA AUTOPAIR_PAIRS
 AUTOPAIR_PAIRS=('`' '`' "'" "'" '"' '"' '{' '}' '[' ']' '(' ')' '<' '>')
 
-typeset -A AUTOPAIR_LBOUNDS
-AUTOPAIR_LBOUNDS=(\
-    all '[.:/\!]' \
-    quotes '[]})a-zA-Z0-9]' \
-    braces '' \
-    '"' '"' \
-    "'" "'" \
-    '`' '`')
+typeset -gA AUTOPAIR_LBOUNDS
+AUTOPAIR_LBOUNDS=('`' '`')
+AUTOPAIR_LBOUNDS[all]='[.:/\!]'
+AUTOPAIR_LBOUNDS[quotes]='[]})a-zA-Z0-9]'
+AUTOPAIR_LBOUNDS[braces]=''
+AUTOPAIR_LBOUNDS['"']='"'
+AUTOPAIR_LBOUNDS["'"]="'"
 
-typeset -A AUTOPAIR_RBOUNDS
-AUTOPAIR_RBOUNDS=(\
-    all '[[{(<,.:?/%$!a-zA-Z0-9]' \
-    quotes '[a-zA-Z0-9]' \
-    braces '')
+typeset -gA AUTOPAIR_RBOUNDS
+AUTOPAIR_RBOUNDS[all]='[[{(<,.:?/%$!a-zA-Z0-9]'
+AUTOPAIR_RBOUNDS[quotes]='[a-zA-Z0-9]'
+AUTOPAIR_RBOUNDS[braces]=''
 
 ####
 
+ap-get-pair() {
+    if [[ -n "$1" ]]; then
+        echo "${AUTOPAIR_PAIRS[$1]}"
+    elif [[ -n "$2" ]]; then
+        for i in ${(@k)AUTOPAIR_PAIRS}; do
+            [[ "$2" == "${AUTOPAIR_PAIRS[$i]}" ]] && echo "$i" && break
+        done
+    fi
+}
+
 ap-boundary-p() {
-    [[ -n "$1" && "$LBUFFER" =~ "${1}$" || -n "$2" && "$RBUFFER" =~ "^${2}" ]]
+    [[ -n "$1" && "$LBUFFER" =~ "$1$" ]] || [[ -n "$2" && "$RBUFFER" =~ "^$2" ]]
 }
 ap-next-to-boundary-p() {
     local groups=(all)
@@ -63,7 +72,7 @@ ap-balanced-p() {
 }
 
 ap-can-pair-p() {
-    local rchar="$AUTOPAIR_PAIRS[$KEYS]"
+    local rchar=$(ap-get-pair "$KEYS")
 
     # Don't pair if pair doesn't exist
     [[ -z "$rchar" ]] && return 1
@@ -74,7 +83,7 @@ ap-can-pair-p() {
         "$RBUFFER" =~ "^($|[ 	])" ]] && return 0
 
     # Don't pair quotes if the delimiters are unbalanced
-    ! ap-balanced-p $KEYS $rchar && return 1
+    ! ap-balanced-p "$KEYS" "$rchar" && return 1
 
     # Don't pair when in front of characters that likely signify the start of a string
     # or path (i.e. boundary characters)
@@ -91,7 +100,7 @@ ap-can-skip-p() {
 
 ap-can-delete-p() {
     local lchar="$LBUFFER[-1]"
-    local rchar="$AUTOPAIR_PAIRS[$lchar]"
+    local rchar=$(ap-get-pair "$lchar")
     ! [[ -n "$rchar" && "$RBUFFER[1]" == "$rchar" ]] && return 1
     [[ "$lchar" == "$rchar" ]] && ! ap-balanced-p "$lchar" "$rchar" && return 1
     return 0
@@ -103,8 +112,8 @@ autopair-self-insert() {
 }
 
 autopair-insert() {
-    local rchar="$AUTOPAIR_PAIRS[$KEYS]"
-    if [[ $KEYS == (\'|\"|\`) ]] && ap-can-skip-p "$KEYS" "$rchar"; then
+    local rchar=$(ap-get-pair "$KEYS")
+    if [[ "$KEYS" == (\'|\"|\`) ]] && ap-can-skip-p "$KEYS" "$rchar"; then
         zle forward-char
     elif ap-can-pair-p; then
         autopair-self-insert "$KEYS" "$rchar"
@@ -114,11 +123,7 @@ autopair-insert() {
 }
 
 autopair-close() {
-    local lchar=
-    for i in ${(@k)AUTOPAIR_PAIRS}; do
-        [[ "$KEYS" == "$AUTOPAIR_PAIRS[$i]" ]] && lchar="$i" && break
-    done
-    if [[ -n "$lchar" ]] && ap-can-skip-p "$lchar" "$KEYS"
+    if ap-can-skip-p $(ap-get-pair "" "$KEYS") "$KEYS"
     then zle forward-char
     else zle self-insert
     fi
