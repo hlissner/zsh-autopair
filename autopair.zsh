@@ -136,21 +136,26 @@ autopair-delete() {
 
 # Initialization
 [[ -z "$AUTOPAIR_INHIBIT_INIT" ]] && {
-    for i in ${(@k)AUTOPAIR_PAIRS}; do
-        bindkey "$i" autopair-insert
-        bindkey -M isearch "$i" self-insert
-    done
+    autoload -U is-at-least
+    if is-at-least 5.0.8; then
+        zle -N autopair-insert
+        zle -N autopair-close
+        zle -N autopair-delete
 
-    local l=(')' '}' ']' '>')
-    for i in $l; do
-        bindkey "$i" autopair-close
-        bindkey -M isearch "$i" self-insert
-    done
+        for i in ${(@k)AUTOPAIR_PAIRS}; do
+            bindkey "$i" autopair-insert
+            bindkey -M isearch "$i" self-insert
+        done
 
-    bindkey "^?" autopair-delete
-    bindkey -M isearch "^?" backward-delete-char
+        local l=(')' '}' ']' '>')
+        for i in $l; do
+            bindkey "$i" autopair-close
+            bindkey -M isearch "$i" self-insert
+        done
 
-    zle -N autopair-insert
-    zle -N autopair-close
-    zle -N autopair-delete
+        bindkey "^?" autopair-delete
+        bindkey -M isearch "^?" backward-delete-char
+    else
+        echo "zsh-autopair doesn't work in zsh < 5.0.8 and has disabled itself. To disable this output, set AUTOPAIR_INHIBIT_INIT=1"
+    fi
 }
