@@ -6,6 +6,10 @@
 A simple plugin that auto-closes, deletes and skips over matching delimiters in zsh
 intelligently. Hopefully.
 
+> NOTE: zsh-autopair seems to have trouble in zsh 5.0.7 and under. See issue #4. Until
+> this is fixed, the plugin will auto-disable itself in zsh < 5.0.8 with a message. The
+> message can be disabled with: `AUTOPAIR_INHIBIT_INIT=1`
+
 e.g.
 * `echo |` => <kbd>"</kbd> => `echo "|"`
 * `rm -f *.|` => <kbd>{</kbd> => `rm -f *.{|}`
