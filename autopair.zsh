@@ -37,7 +37,8 @@ ap-boundary-p() {
     [[ -n "$1" && "$LBUFFER" =~ "$1$" ]] || [[ -n "$2" && "$RBUFFER" =~ "^$2" ]]
 }
 ap-next-to-boundary-p() {
-    local groups=(all)
+    local -a groups
+    groups=(all)
     case "$1" in
         \'|\"|\`)    groups+=quotes ;;
         \{|\[|\(|\<) groups+=braces ;;
@@ -147,7 +148,8 @@ autopair-delete() {
             bindkey -M isearch "$i" self-insert
         done
 
-        local l=(')' '}' ']' '>')
+        local -a l
+        l=(')' '}' ']' '>')
         for i in $l; do
             bindkey "$i" autopair-close
             bindkey -M isearch "$i" self-insert
