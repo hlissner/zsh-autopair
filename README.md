@@ -1,12 +1,12 @@
 # zsh-autopair
 
 ![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)
-![ZSH 5.0.8](https://img.shields.io/badge/zsh-v5.0.8-orange.svg?style=flat-square)
+![ZSH 5.0.2](https://img.shields.io/badge/zsh-v5.0.2-orange.svg?style=flat-square)
 
 A simple plugin that auto-closes, deletes and skips over matching delimiters in zsh
 intelligently. Hopefully.
 
-> NOTE: zsh-autopair is untested for versions of Zsh below 5.0.8. Please report any
+> NOTE: zsh-autopair is untested for versions of Zsh below 5.0.2. Please report any
 > issues you have in earlier versions!
 
 e.g.
@@ -89,7 +89,6 @@ Feel free to tweak the following variables to adjust autopair's behavior:
 
   Individual delimiters can be used too. Setting `$AUTOPAIR_RBOUNDS['{']="[0-9]"` will
   cause <kbd>{</kbd> specifically to not be autopaired when the cursor precedes a number.
-
 
 [zshrc]: https://github.com/hlissner/dotfiles/blob/master/zshrc
 [zsh-syntax-highlighting]: https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters/pattern.md
