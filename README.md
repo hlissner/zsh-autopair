@@ -1,6 +1,5 @@
 # zsh-autopair
-
-![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](./LICENSE)
 ![ZSH 5.0.2](https://img.shields.io/badge/zsh-v5.0.2-orange.svg?style=flat-square)
 
 A simple plugin that auto-closes, deletes and skips over matching delimiters in zsh
