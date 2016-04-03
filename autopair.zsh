@@ -136,7 +136,7 @@ autopair-delete() {
 }
 
 # Initialization
-[[ -z "$AUTOPAIR_INHIBIT_INIT" ]] && {
+autopair-init() {
     zle -N autopair-insert
     zle -N autopair-close
     zle -N autopair-delete
@@ -156,3 +156,4 @@ autopair-delete() {
     bindkey "^?" autopair-delete
     bindkey -M isearch "^?" backward-delete-char
 }
+[[ -z "$AUTOPAIR_INHIBIT_INIT" ]] && autopair-init
