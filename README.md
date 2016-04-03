@@ -38,7 +38,7 @@ fi
 ### Zgen + Prezto
 
 Prezto's Editor module will reset autopair's bindings. A workaround is available in
-[issue #6](./issues/6).
+[issue #6](https://github.com/hlissner/zsh-autopair/issues/6).
 
 ## Usage
 
