@@ -35,7 +35,7 @@ if ! zgen saved; then
 fi
 ```
 
-## Zgen + Prezto
+### Zgen + Prezto
 
 Prezto's Editor module will reset autopair's bindings. A workaround is available in
 [issue #6](./issues/6).
