@@ -6,7 +6,7 @@ AUTOPAIR_INHIBIT_INIT=${AUTOPAIR_INHIBIT_INIT:-}
 AUTOPAIR_BETWEEN_WHITESPACE=${AUTOPAIR_BETWEEN_WHITESPACE:-}
 
 typeset -gA AUTOPAIR_PAIRS
-AUTOPAIR_PAIRS=('`' '`' "'" "'" '"' '"' '{' '}' '[' ']' '(' ')' '<' '>')
+AUTOPAIR_PAIRS=('`' '`' "'" "'" '"' '"' '{' '}' '[' ']' '(' ')')
 
 typeset -gA AUTOPAIR_LBOUNDS
 AUTOPAIR_LBOUNDS=('`' '`')
@@ -147,7 +147,7 @@ autopair-delete() {
     done
 
     local -a l
-    l=(')' '}' ']' '>')
+    l=(')' '}' ']')
     for i in $l; do
         bindkey "$i" autopair-close
         bindkey -M isearch "$i" self-insert
