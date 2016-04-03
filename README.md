@@ -23,17 +23,22 @@ Download and source `autopair.zsh`
 `antigen-bundle hlissner/zsh-autopair`
 
 ### zgen
-  ```
-  if ! zgen saved; then
-      echo "Creating a zgen save"
+```
+if ! zgen saved; then
+    echo "Creating a zgen save"
 
-      # ... other plugins
+    # ... other plugins
 
-      zgen load hlissner/zsh-autopair
+    zgen load hlissner/zsh-autopair
 
-      zgen save
-  fi
-  ```
+    zgen save
+fi
+```
+
+## Zgen + Prezto
+
+Prezto's Editor module will reset autopair's bindings. A workaround is available in
+[issue #6](./issues/6).
 
 ## Usage
 
