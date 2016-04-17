@@ -40,6 +40,12 @@ fi
 Prezto's Editor module will reset autopair's bindings. A workaround is available in
 [issue #6](https://github.com/hlissner/zsh-autopair/issues/6).
 
+### zplug
+Load autopair after compinit, otherwise, the plugin won't work.
+```bash
+zplug "hlissner/zsh-autopair", nice:10
+```
+
 ## Usage
 
 zsh-autopair sets itself up, unless you have `AUTOPAIR_INHIBIT_INIT` set.
