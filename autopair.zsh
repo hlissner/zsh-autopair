@@ -154,6 +154,8 @@ autopair-init() {
     done
 
     bindkey "^?" autopair-delete
+    bindkey "^h" autopair-delete
     bindkey -M isearch "^?" backward-delete-char
+    bindkey -M isearch "^h" backward-delete-char
 }
 [[ -z "$AUTOPAIR_INHIBIT_INIT" ]] && autopair-init
