@@ -27,6 +27,7 @@ ap-get-pair() {
     if [[ -n "$1" ]]; then
         echo "${AUTOPAIR_PAIRS[$1]}"
     elif [[ -n "$2" ]]; then
+        local i
         for i in ${(@k)AUTOPAIR_PAIRS}; do
             [[ "$2" == "${AUTOPAIR_PAIRS[$i]}" ]] && echo "$i" && break
         done
@@ -44,6 +45,7 @@ ap-next-to-boundary-p() {
         \{|\[|\(|\<) groups+=braces ;;
     esac
     groups+="$1"
+    local group
     for group in $groups; do
         ap-boundary-p "$AUTOPAIR_LBOUNDS[$group]" "$AUTOPAIR_RBOUNDS[$group]" && return 0
     done
@@ -141,6 +143,7 @@ autopair-init() {
     zle -N autopair-close
     zle -N autopair-delete
 
+    local i
     for i in ${(@k)AUTOPAIR_PAIRS}; do
         bindkey "$i" autopair-insert
         bindkey -M isearch "$i" self-insert
