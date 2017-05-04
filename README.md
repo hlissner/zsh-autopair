@@ -2,17 +2,31 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](./LICENSE)
 ![ZSH 5.0.2](https://img.shields.io/badge/zsh-v5.0.2-orange.svg?style=flat-square)
 
-A simple plugin that auto-closes, deletes and skips over matching delimiters in zsh
-intelligently. Hopefully.
+A simple plugin that auto-closes, deletes and skips over matching delimiters in
+zsh intelligently. Hopefully.
 
-> NOTE: zsh-autopair is untested for versions of Zsh below 5.0.2. Please report any
-> issues you have in earlier versions!
+> NOTE: zsh-autopair is untested for versions of Zsh below 5.0.2. Please report
+> any issues you have in earlier versions!
 
-e.g.
-* `echo |` => <kbd>"</kbd> => `echo "|"`
-* `rm -f *.|` => <kbd>{</kbd> => `rm -f *.{|}`
-* `git commit -m "|"` => <kbd>backspace</kbd> => `git commit -m |`
-* `cat ./*.{py,rb|}` => <kbd>}</kbd> => `cat ./*.{py,rb}|`
+More specifically, zsh-autopair does 4 things for you:
+
+1. It inserts matching pairs (when that pair isn't unbalanced and the cursor is
+   _not_ adjacent to a word character)
+
+   e.g. `echo |` => <kbd>"</kbd> => `echo "|"`
+
+2. It skips over matched pairs:
+
+   e.g. `cat ./*.{py,rb|}` => <kbd>}</kbd> => `cat ./*.{py,rb}|`
+
+3. It auto-deletes pairs:
+
+   e.g. `git commit -m "|"` => <kbd>backspace</kbd> => `git commit -m |`
+
+4. And does all of the above only when it makes sense to do so. i.e. when the
+   pair is balanced. e.g.
+
+   e.g. `echo "|""` => <kbd>backspace</kbd> => `echo |""` (doesn't aggressively eat up too many quotes)
 
 ## Install
 
@@ -37,8 +51,8 @@ fi
 
 ### Zgen + Prezto
 
-Prezto's Editor module will reset autopair's bindings. A workaround is available in
-[issue #6](https://github.com/hlissner/zsh-autopair/issues/6).
+Prezto's Editor module will reset autopair's bindings. A workaround is available
+in [issue #6](https://github.com/hlissner/zsh-autopair/issues/6).
 
 ### zplug
 Load autopair after compinit, otherwise, the plugin won't work.
@@ -52,26 +66,25 @@ zsh-autopair sets itself up, unless you have `AUTOPAIR_INHIBIT_INIT` set.
 
 * If delimiters on the right side of the cursor are interfering with completion, bind
   <kbd>Tab</kbd> to `expand-or-complete-prefix`. Which will offer completion and ignore
-  what's to the right of cursor.`
+  what's to the right of cursor.
 
   `bindkey '^I' expand-or-complete-prefix`
 
-* zsh-autopair will interfere with isearch, and will disable itself in isearch, so long
-  as `AUTOPAIR_INHIBIT_INIT` is not set.
+* zsh-autopair silently disables itself in isearch; the two are incompatible.
 * Works wonderfully with [zsh-syntax-highlight] and
-  `ZSH_HIGHLIGHT_HIGHLIGHTERS+=brackets`. Just be sure you load zsh-syntax-highlight
-  *after* zsh-autopair.
+  `ZSH_HIGHLIGHT_HIGHLIGHTERS+=brackets`, but zsh-syntax-highlight must be
+  loaded *after* zsh-autopair.
 * Mixes well with these vi-mode zsh modules: [surround], [select-quoted], and
   [select-bracketed] (they're built into zsh as of zsh-5.0.8)
-* Check out my [zshrc]. I've spent unholy amounts of time tweaking it.
+* Check out my [zsh config]. I've spent unholy amounts of time tweaking it.
 
 ## Configuration
 
 Feel free to tweak the following variables to adjust autopair's behavior:
 
 * `AUTOPAIR_BETWEEN_WHITESPACE` (default: blank): if set, regardless of whether
-  delimiters are unbalanced or do not meet a boundary check, pairs will be auto-closed
-  if surrounded by whitespace, BOL or EOL.
+  delimiters are unbalanced or do not meet a boundary check, pairs will be
+  auto-closed if surrounded by whitespace, BOL or EOL.
 * `AUTOPAIR_INHIBIT_INIT` (default: blank): if set, autopair will not automatically set
   up keybinds. [Check out the initialization code](autopair.zsh#L118) if you want to
   know what it does.
@@ -100,7 +113,8 @@ Feel free to tweak the following variables to adjust autopair's behavior:
   Individual delimiters can be used too. Setting `$AUTOPAIR_RBOUNDS['{']="[0-9]"` will
   cause <kbd>{</kbd> specifically to not be autopaired when the cursor precedes a number.
 
-[zshrc]: https://github.com/hlissner/dotfiles/blob/master/zshrc
+
+[zshrc]: https://github.com/hlissner/dotfiles/tree/master/shell/%2Bzsh
 [zsh-syntax-highlighting]: https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters/pattern.md
 [surround]: https://github.com/zsh-users/zsh/blob/master/Functions/Zle/surround
 [select-quoted]: https://github.com/zsh-users/zsh/blob/master/Functions/Zle/select-quoted
