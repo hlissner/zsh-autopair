@@ -6,13 +6,14 @@ AUTOPAIR_INHIBIT_INIT=${AUTOPAIR_INHIBIT_INIT:-}
 AUTOPAIR_BETWEEN_WHITESPACE=${AUTOPAIR_BETWEEN_WHITESPACE:-}
 
 typeset -gA AUTOPAIR_PAIRS
-AUTOPAIR_PAIRS=('`' '`' "'" "'" '"' '"' '{' '}' '[' ']' '(' ')')
+AUTOPAIR_PAIRS=('`' '`' "'" "'" '"' '"' '{' '}' '[' ']' '(' ')' ' ' ' ')
 
 typeset -gA AUTOPAIR_LBOUNDS
 AUTOPAIR_LBOUNDS=('`' '`')
 AUTOPAIR_LBOUNDS[all]='[.:/\!]'
 AUTOPAIR_LBOUNDS[quotes]='[]})a-zA-Z0-9]'
 AUTOPAIR_LBOUNDS[braces]=''
+AUTOPAIR_LBOUNDS[spaces]="[ '\"]"
 AUTOPAIR_LBOUNDS['"']='"'
 AUTOPAIR_LBOUNDS["'"]="'"
 
@@ -20,6 +21,7 @@ typeset -gA AUTOPAIR_RBOUNDS
 AUTOPAIR_RBOUNDS[all]='[[{(<,.:?/%$!a-zA-Z0-9]'
 AUTOPAIR_RBOUNDS[quotes]='[a-zA-Z0-9]'
 AUTOPAIR_RBOUNDS[braces]=''
+AUTOPAIR_RBOUNDS[spaces]="[ '\"]"
 
 ####
 
@@ -43,6 +45,7 @@ ap-next-to-boundary-p() {
     case "$1" in
         \'|\"|\`)    groups+=quotes ;;
         \{|\[|\(|\<) groups+=braces ;;
+        " ")         groups+=spaces ;;
     esac
     groups+="$1"
     local group
@@ -86,7 +89,9 @@ ap-can-pair-p() {
         "$RBUFFER" =~ "^($|[ 	])" ]] && return 0
 
     # Don't pair quotes if the delimiters are unbalanced
-    ! ap-balanced-p "$KEYS" "$rchar" && return 1
+    if [[ "$rchar" != " " ]]; then
+        ! ap-balanced-p "$KEYS" "$rchar" && return 1
+    fi
 
     # Don't pair when in front of characters that likely signify the start of a string
     # or path (i.e. boundary characters)
@@ -96,6 +101,7 @@ ap-can-pair-p() {
 }
 
 ap-can-skip-p() {
+    [[ "$1" == " " && "$1" == "$2" ]] && return 1
     ! [[ -n "$2" && "$RBUFFER[1]" == "$2" && "$LBUFFER[-1]" != '\' ]] && return 1
     [[ "$1" == "$2" ]] && ! ap-balanced-p "$1" "$2" && return 1
     return 0
@@ -116,7 +122,7 @@ autopair-self-insert() {
 
 autopair-insert() {
     local rchar=$(ap-get-pair "$KEYS")
-    if [[ "$KEYS" == (\'|\"|\`) ]] && ap-can-skip-p "$KEYS" "$rchar"; then
+    if [[ "$KEYS" == (\'|\"|\`| ) ]] && ap-can-skip-p "$KEYS" "$rchar"; then
         zle forward-char
     elif ap-can-pair-p; then
         autopair-self-insert "$KEYS" "$rchar"
