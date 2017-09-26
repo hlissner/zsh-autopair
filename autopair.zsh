@@ -4,6 +4,7 @@
 
 AUTOPAIR_INHIBIT_INIT=${AUTOPAIR_INHIBIT_INIT:-}
 AUTOPAIR_BETWEEN_WHITESPACE=${AUTOPAIR_BETWEEN_WHITESPACE:-}
+AUTOPAIR_SPC_WIDGET=$(bindkey " " | cut -c5-)
 
 typeset -gA AUTOPAIR_PAIRS
 AUTOPAIR_PAIRS=('`' '`' "'" "'" '"' '"' '{' '}' '[' ']' '(' ')' ' ' ' ')
@@ -83,18 +84,22 @@ ap-can-pair-p() {
     # Don't pair if pair doesn't exist
     [[ -z "$rchar" ]] && return 1
 
-    # Force pair if surrounded by space/[BE]OL, regardless of boundaries/balance
-    [[ -n "$AUTOPAIR_BETWEEN_WHITESPACE" && \
-        "$LBUFFER" =~ "(^|[ 	])$" && \
-        "$RBUFFER" =~ "^($|[ 	])" ]] && return 0
-
     # Don't pair quotes if the delimiters are unbalanced
     if [[ "$rchar" != " " ]]; then
+        # Force pair if surrounded by space/[BE]OL, regardless of
+        # boundaries/balance
+        [[ -n "$AUTOPAIR_BETWEEN_WHITESPACE" && \
+            "$LBUFFER" =~ "(^|[ 	])$" && \
+            "$RBUFFER" =~ "^($|[ 	])" ]] && return 0
+
+        # Don't pair quotes if the delimiters are unbalanced
         ! ap-balanced-p "$KEYS" "$rchar" && return 1
+    elif [[ "$RBUFFER" =~ "^[ 	]*$" ]]; then
+        return 1
     fi
 
-    # Don't pair when in front of characters that likely signify the start of a string
-    # or path (i.e. boundary characters)
+    # Don't pair when in front of characters that likely signify the start of a
+    # string or path (i.e. boundary characters)
     ap-next-to-boundary-p "$KEYS" "$rchar" && return 1
 
     return 0
@@ -126,6 +131,8 @@ autopair-insert() {
         zle forward-char
     elif ap-can-pair-p; then
         autopair-self-insert "$KEYS" "$rchar"
+    elif [[ "$rchar" == " " && -n "$AUTOPAIR_SRC_WIDGET" ]]; then
+        zle $AUTOPAIR_SPC_WIDGET
     else
         zle self-insert
     fi
