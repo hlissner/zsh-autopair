@@ -14,7 +14,7 @@ AUTOPAIR_LBOUNDS=('`' '`')
 AUTOPAIR_LBOUNDS[all]='[.:/\!]'
 AUTOPAIR_LBOUNDS[quotes]='[]})a-zA-Z0-9]'
 AUTOPAIR_LBOUNDS[braces]=''
-AUTOPAIR_LBOUNDS[spaces]="[ '\"]"
+AUTOPAIR_LBOUNDS[spaces]="[^]})]"
 AUTOPAIR_LBOUNDS['"']='"'
 AUTOPAIR_LBOUNDS["'"]="'"
 
@@ -22,7 +22,7 @@ typeset -gA AUTOPAIR_RBOUNDS
 AUTOPAIR_RBOUNDS[all]='[[{(<,.:?/%$!a-zA-Z0-9]'
 AUTOPAIR_RBOUNDS[quotes]='[a-zA-Z0-9]'
 AUTOPAIR_RBOUNDS[braces]=''
-AUTOPAIR_RBOUNDS[spaces]="[ '\"]"
+AUTOPAIR_RBOUNDS[spaces]="[^]})]"
 
 ####
 
