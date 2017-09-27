@@ -64,7 +64,12 @@ ap-balanced-p() {
     local rlen="${#rbuf//[^$2]}"
     (( $rlen == 0 && $llen == 0 )) && return 0
     if [[ "$1" == "$2" ]]; then
-        (( $llen == $rlen || ($llen + $rlen) % 2 == 0 )) && return 0
+        if [[ "$1" == " " ]]; then
+            [[ "$LBUFFER" =~ "[^'\"]([ 	]+)$" && "$RBUFFER" =~ "^$match[1]" ]] && return 0
+            return 1
+        elif (( $llen == $rlen || ($llen + $rlen) % 2 == 0 )); then
+            return 0
+        fi
     else
         local l2len="${#lbuf//[^$2]}"
         local r2len="${#rbuf//[^$1]}"
