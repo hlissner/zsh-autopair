@@ -65,6 +65,10 @@ ap-balanced-p() {
     (( $rlen == 0 && $llen == 0 )) && return 0
     if [[ "$1" == "$2" ]]; then
         if [[ "$1" == " " ]]; then
+            # Silence WARN_CREATE_GLOBAL errors
+            local match=
+            local mbegin=
+            local mend=
             [[ "$LBUFFER" =~ "[^'\"]([ 	]+)$" && "$RBUFFER" =~ "^$match[1]" ]] && return 0
             return 1
         elif (( $llen == $rlen || ($llen + $rlen) % 2 == 0 )); then
