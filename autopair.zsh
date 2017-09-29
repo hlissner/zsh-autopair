@@ -14,7 +14,7 @@ AUTOPAIR_LBOUNDS=('`' '`')
 AUTOPAIR_LBOUNDS[all]='[.:/\!]'
 AUTOPAIR_LBOUNDS[quotes]='[]})a-zA-Z0-9]'
 AUTOPAIR_LBOUNDS[braces]=''
-AUTOPAIR_LBOUNDS[spaces]="[^]})]"
+AUTOPAIR_LBOUNDS[spaces]="[^[{(]"
 AUTOPAIR_LBOUNDS['"']='"'
 AUTOPAIR_LBOUNDS["'"]="'"
 
