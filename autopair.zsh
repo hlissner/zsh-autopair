@@ -170,10 +170,6 @@ autopair-delete() {
 
 # Initialization
 autopair-init() {
-    if [[ $MC_SID ]]; then
-        unset AUTOPAIR_PAIRS[" "]
-    fi
-
     zle -N autopair-insert
     zle -N autopair-close
     zle -N autopair-delete
