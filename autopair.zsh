@@ -174,17 +174,16 @@ autopair-init() {
     zle -N autopair-close
     zle -N autopair-delete
 
-    local i
-    for i in ${(@k)AUTOPAIR_PAIRS}; do
-        bindkey "$i" autopair-insert
-        bindkey -M isearch "$i" self-insert
-    done
+    local p
+    for p in ${(@k)AUTOPAIR_PAIRS}; do
+        bindkey "$p" autopair-insert
+        bindkey -M isearch "$p" self-insert
 
-    local -a l
-    l=(')' '}' ']')
-    for i in $l; do
-        bindkey "$i" autopair-close
-        bindkey -M isearch "$i" self-insert
+        local rchar=$(ap-get-pair $p)
+        if [[ $p != $rchar ]]; then
+            bindkey "$rchar" autopair-close
+            bindkey -M isearch "$rchar" self-insert
+        fi
     done
 
     bindkey "^?" autopair-delete
