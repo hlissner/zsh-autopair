@@ -140,7 +140,7 @@ autopair-insert() {
         zle forward-char
     elif ap-can-pair-p; then
         autopair-self-insert "$KEYS" "$rchar"
-    elif [[ "$rchar" == " " && -n "$AUTOPAIR_SRC_WIDGET" ]]; then
+    elif [[ "$rchar" == " " && -n "$AUTOPAIR_SPC_WIDGET" ]]; then
         zle $AUTOPAIR_SPC_WIDGET
     else
         zle self-insert
