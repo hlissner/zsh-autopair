@@ -1,7 +1,5 @@
 #!/usr/bin/env zsh
 
-# A widget that auto-inserts matching pairs in ZSH.
-
 AUTOPAIR_INHIBIT_INIT=${AUTOPAIR_INHIBIT_INIT:-}
 AUTOPAIR_BETWEEN_WHITESPACE=${AUTOPAIR_BETWEEN_WHITESPACE:-}
 AUTOPAIR_SPC_WIDGET=${AUTOPAIR_SPC_WIDGET:-$(bindkey " " | cut -c5-)}
@@ -24,9 +22,11 @@ AUTOPAIR_RBOUNDS+=(quotes '[a-zA-Z0-9]')
 AUTOPAIR_RBOUNDS+=(spaces '[^]})]')
 AUTOPAIR_RBOUNDS+=(braces '')
 
-####
 
-ap-get-pair() {
+### Helpers ############################
+
+# Returns the other pair for $1 (a char), blank otherwise
+_ap-get-pair() {
     if [[ $1 ]]; then
         echo $AUTOPAIR_PAIRS[$1]
     elif [[ $2 ]]; then
@@ -37,11 +37,13 @@ ap-get-pair() {
     fi
 }
 
-ap-boundary-p() {
-    [[ -n $1 && $LBUFFER =~ "$1$" ]] || [[ -n $2 && $RBUFFER =~ "^$2" ]]
+# Return 0 if cursor's surroundings match either regexp: $1 (left) or $2 (right)
+_ap-boundary-p() {
+    [[ $1 && $LBUFFER =~ "$1$" ]] || [[ $2 && $RBUFFER =~ "^$2" ]]
 }
 
-ap-next-to-boundary-p() {
+# Return 0 if the surrounding text matches any of the AUTOPAIR_*BOUNDS regexps
+_ap-next-to-boundary-p() {
     local -a groups
     groups=(all)
     case $1 in
@@ -52,13 +54,14 @@ ap-next-to-boundary-p() {
     groups+=$1
     local group
     for group in $groups; do
-        ap-boundary-p $AUTOPAIR_LBOUNDS[$group] $AUTOPAIR_RBOUNDS[$group] && return 0
+        _ap-boundary-p $AUTOPAIR_LBOUNDS[$group] $AUTOPAIR_RBOUNDS[$group] && return 0
     done
     return 1
 }
 
-# If provided pair is balanced in the buffer
-ap-balanced-p() {
+# Return 0 if there are the same number of $1 as there are $2 (chars; a
+# delimiter pair) in the buffer.
+_ap-balanced-p() {
     local lbuf="${LBUFFER//\\$1}"
     local rbuf="${RBUFFER//\\$2}"
     local llen="${#lbuf//[^$1]}"
@@ -71,6 +74,8 @@ ap-balanced-p() {
             local match=
             local mbegin=
             local mend=
+            # Balancing spaces is unnecessary. If there is at least one space on
+            # either side of the cursor, it is considered balanced.
             [[ $LBUFFER =~ "[^'\"]([ 	]+)$" && $RBUFFER =~ "^${match[1]}" ]] && return 0
             return 1
         elif (( llen == rlen || (llen + rlen) % 2 == 0 )); then
@@ -89,13 +94,12 @@ ap-balanced-p() {
     return 1
 }
 
-ap-can-pair-p() {
-    local rchar=$(ap-get-pair $KEYS)
+# Return 0 if the last keypress can be auto-paired.
+_ap-can-pair-p() {
+    local rchar=$(_ap-get-pair $KEYS)
 
-    # Don't pair if pair doesn't exist
     [[ $rchar ]] || return 1
 
-    # Don't pair quotes if the delimiters are unbalanced
     if [[ $rchar != " " ]]; then
         # Force pair if surrounded by space/[BE]OL, regardless of
         # boundaries/balance
@@ -104,23 +108,25 @@ ap-can-pair-p() {
             $RBUFFER =~ "^($|[ 	])" ]] && return 0
 
         # Don't pair quotes if the delimiters are unbalanced
-        ! ap-balanced-p $KEYS $rchar && return 1
+        ! _ap-balanced-p $KEYS $rchar && return 1
     elif [[ $RBUFFER =~ "^[ 	]*$" ]]; then
+        # Don't pair spaces surrounded by whitespace
         return 1
     fi
 
     # Don't pair when in front of characters that likely signify the start of a
-    # string or path (i.e. boundary characters)
-    ap-next-to-boundary-p $KEYS $rchar && return 1
+    # string, path or undesirable boundary.
+    _ap-next-to-boundary-p $KEYS $rchar && return 1
 
     return 0
 }
 
-ap-can-skip-p() {
+# Return 0 if the adjacent character (on the right) can be safely skipped over.
+_ap-can-skip-p() {
     if [[ $1 == $2 ]]; then
         if [[ $1 == " " ]]; then
             return 1
-        elif ! ap-balanced-p $1 $2; then
+        elif ! _ap-balanced-p $1 $2; then
             return 1
         fi
     fi
@@ -130,25 +136,30 @@ ap-can-skip-p() {
     return 0
 }
 
-ap-can-delete-p() {
+# Return 0 if the adjacent character (on the right) can be safely deleted.
+_ap-can-delete-p() {
     local lchar="$LBUFFER[-1]"
-    local rchar=$(ap-get-pair $lchar)
+    local rchar=$(_ap-get-pair $lchar)
     ! [[ $rchar && $RBUFFER[1] == $rchar ]] && return 1
-    [[ $lchar == $rchar ]] && ! ap-balanced-p $lchar $rchar && return 1
+    [[ $lchar == $rchar ]] && ! _ap-balanced-p $lchar $rchar && return 1
     return 0
 }
 
-autopair-self-insert() {
-    LBUFFER+=$1$2
-    zle backward-char
+# Insert $1 and add $2 after the cursor
+_ap-self-insert() {
+    LBUFFER+=$1
+    RBUFFER="$2$RBUFFER"
 }
 
+
+### Widgets ############################
+
 autopair-insert() {
-    local rchar=$(ap-get-pair $KEYS)
-    if [[ $KEYS == (\'|\"|\`| ) ]] && ap-can-skip-p $KEYS $rchar; then
+    local rchar=$(_ap-get-pair $KEYS)
+    if [[ $KEYS == (\'|\"|\`| ) ]] && _ap-can-skip-p $KEYS $rchar; then
         zle forward-char
-    elif ap-can-pair-p; then
-        autopair-self-insert $KEYS $rchar
+    elif _ap-can-pair-p; then
+        _ap-self-insert $KEYS $rchar
     elif [[ $rchar == " " && $AUTOPAIR_SPC_WIDGET ]]; then
         zle $AUTOPAIR_SPC_WIDGET
     else
@@ -157,18 +168,21 @@ autopair-insert() {
 }
 
 autopair-close() {
-    if ap-can-skip-p $(ap-get-pair "" $KEYS) $KEYS
-    then zle forward-char
-    else zle self-insert
+    if _ap-can-skip-p $(_ap-get-pair "" $KEYS) $KEYS; then
+        zle forward-char
+    else
+        zle self-insert
     fi
 }
 
 autopair-delete() {
-    ap-can-delete-p && zle .delete-char
+    _ap-can-delete-p && zle .delete-char
     zle backward-delete-char
 }
 
-# Initialization
+
+### Initialization #####################
+
 autopair-init() {
     zle -N autopair-insert
     zle -N autopair-close
@@ -179,7 +193,7 @@ autopair-init() {
         bindkey "$p" autopair-insert
         bindkey -M isearch "$p" self-insert
 
-        local rchar=$(ap-get-pair $p)
+        local rchar=$(_ap-get-pair $p)
         if [[ $p != $rchar ]]; then
             bindkey "$rchar" autopair-close
             bindkey -M isearch "$rchar" self-insert
