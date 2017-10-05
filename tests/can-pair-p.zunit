@@ -1,0 +1,52 @@
+#!/usr/bin/env zunit
+@test 'pair if blank line' {
+    KEYS="'" LBUFFER="" RBUFFER="" assert_true _ap-can-pair-p
+}
+
+@test 'pair if next to balanced delimiter' { # {{|}}
+    KEYS="{" LBUFFER="{" RBUFFER="}" assert_true _ap-can-pair-p
+}
+
+@test 'pair space if next to brackets' { # { | }
+    KEYS=" "
+    LBUFFER="{" RBUFFER="}" assert_true _ap-can-pair-p
+    LBUFFER="[" RBUFFER="]" assert_true _ap-can-pair-p
+    LBUFFER="(" RBUFFER=")" assert_true _ap-can-pair-p
+}
+
+@test 'pair brackets at the end of a word' { # abc{|}
+    KEYS='{' LBUFFER="hello" assert_true _ap-can-pair-p
+}
+
+@test 'do not pair brackets at the beginning of a word' { # {|abc
+    KEYS='{' RBUFFER="hello" assert_false _ap-can-pair-p
+}
+
+@test 'do not pair quotes next to a word' {
+    KEYS="'"
+    LBUFFER="hello" assert_false _ap-can-pair-p  # abc"|
+    RBUFFER="hello" assert_false _ap-can-pair-p  # "|abc
+}
+
+@test 'do not pair the same quotes from inside quotes' { # ""|"
+    KEYS='"' LBUFFER='"' RBUFFER='"' assert_false _ap-can-pair-p
+}
+
+@test 'do not pair if delimiter is invalid' {
+    KEYS="<" LBUFFER="<" RBUFFER=">" assert_false _ap-can-pair-p
+}
+
+@test 'do not pair if next to unbalanced delimiter' { # {|}
+    KEYS="{" LBUFFER="" RBUFFER="}" assert_false _ap-can-pair-p
+}
+
+@test 'do not pair if next to unbalanced delimiter after space' { # {|    }
+    KEYS="{" LBUFFER="" RBUFFER="    }" assert_false _ap-can-pair-p
+}
+
+@test 'do not pair space if next to non-brackets/spaces' {
+    KEYS=" "
+    LBUFFER="'"   RBUFFER="'"   assert_false _ap-can-pair-p  # ' |'
+    LBUFFER="abc" RBUFFER="xyz" assert_false _ap-can-pair-p  # abc |xyz'
+    LBUFFER="[  " RBUFFER=" ]"  assert_false _ap-can-pair-p  # [   | ]
+}

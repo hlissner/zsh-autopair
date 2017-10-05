@@ -1,0 +1,16 @@
+#!/usr/bin/env zunit
+@test 'basic boundary tests' {
+    LBUFFER="abc"
+    RBUFFER="123"
+    assert_false _ap-boundary-p " " " "
+    assert_true _ap-boundary-p "[^3]" "[^a]"
+    assert_false _ap-boundary-p "[^c]" "[^1]"
+    assert_true _ap-boundary-p "c" " "
+    assert_true _ap-boundary-p " " "1"
+}
+
+@test 'no boundary on blank line' {
+    LBUFFER=
+    RBUFFER=
+    assert_false _ap-next-to-boundary-p "{"
+}
