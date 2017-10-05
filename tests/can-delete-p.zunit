@@ -1,0 +1,24 @@
+#!/usr/bin/env zunit
+@test 'delete if next to space and pair' {
+    LBUFFER="[ " RBUFFER=" ]" assert_true _ap-can-delete-p
+}
+
+@test 'delete if next to homogeneous counter-pair' {
+    LBUFFER="'" RBUFFER="'" assert_true _ap-can-delete-p
+}
+
+@test 'delete if next to heterogeneous counter-pair' {
+    LBUFFER="(" RBUFFER=")" assert_true _ap-can-delete-p
+}
+
+@test 'do not delete if at eol' {
+    LBUFFER="'" assert_false _ap-can-delete-p
+}
+
+@test 'do not delete if within too many spaces' {
+    LBUFFER="[  " RBUFFER=" ]" assert_false _ap-can-delete-p
+}
+
+@test 'do not delete if only next to space' {
+    LBUFFER=" " RBUFFER=" " assert_false _ap-can-delete-p
+}

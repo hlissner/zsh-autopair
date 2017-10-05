@@ -1,0 +1,25 @@
+#!/usr/bin/env zunit
+
+@test 'fail skip-check on blank line' {
+    LBUFFER='' RBUFFER='' assert_false _ap-can-skip-p '{' '}'
+}
+
+@test 'fail skip-check on wrong pair' {
+    LBUFFER='"' RBUFFER='"' assert_false _ap-can-skip-p '{' '}'
+}
+
+@test 'skip if next to homogeneous counter-pair' {
+    LBUFFER='"' RBUFFER='"' assert_true _ap-can-skip-p '"' '"'
+}
+
+@test 'skip if next to heterogeneous counter-pair' {
+    LBUFFER='{' RBUFFER='}' assert_true _ap-can-skip-p '{' '}'
+}
+
+@test 'do not skip if next to unbalanced, homogeneous counter-pair' {
+    LBUFFER='' RBUFFER='"' assert_false _ap-can-skip-p '"' '"'
+}
+
+@test 'do not skip if next to unbalanced, heterogeneous counter-pair' {
+    LBUFFER='' RBUFFER='}' assert_false _ap-can-skip-p '{' '}'
+}

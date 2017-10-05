@@ -1,0 +1,26 @@
+#!/usr/bin/env zunit
+@test 'existing pair' {
+    assert $(_ap-get-pair "{") same_as "}"
+}
+
+@test 'existing right-pair' {
+    assert $(_ap-get-pair "" "}") same_as "{"
+}
+
+@test 'non-existent pair' {
+    assert $(_ap-get-pair "<") same_as ""
+}
+
+@test 'non-existent right-pair' {
+    assert $(_ap-get-pair "" ">") same_as ""
+}
+
+@test 'all default pairs' {
+    assert '"' in ${(@k)AUTOPAIR_PAIRS}
+    assert "'" in ${(@k)AUTOPAIR_PAIRS}
+    assert '`' in ${(@k)AUTOPAIR_PAIRS}
+    assert '{' in ${(@k)AUTOPAIR_PAIRS}
+    assert '[' in ${(@k)AUTOPAIR_PAIRS}
+    assert '(' in ${(@k)AUTOPAIR_PAIRS}
+    assert ' ' in ${(@k)AUTOPAIR_PAIRS}
+}
