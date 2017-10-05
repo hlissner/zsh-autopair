@@ -3,6 +3,7 @@
 AUTOPAIR_INHIBIT_INIT=${AUTOPAIR_INHIBIT_INIT:-}
 AUTOPAIR_BETWEEN_WHITESPACE=${AUTOPAIR_BETWEEN_WHITESPACE:-}
 AUTOPAIR_SPC_WIDGET=${AUTOPAIR_SPC_WIDGET:-$(bindkey " " | cut -c5-)}
+AUTOPAIR_BKSPC_WIDGET=${AUTOPAIR_BKSPC_WIDGET:-$(bindkey "^?" | cut -c5-)}
 
 typeset -gA AUTOPAIR_PAIRS
 AUTOPAIR_PAIRS=('`' '`' "'" "'" '"' '"' '{' '}' '[' ']' '(' ')' ' ' ' ')
@@ -160,8 +161,8 @@ autopair-insert() {
         zle forward-char
     elif _ap-can-pair-p; then
         _ap-self-insert $KEYS $rchar
-    elif [[ $rchar == " " && $AUTOPAIR_SPC_WIDGET ]]; then
-        zle $AUTOPAIR_SPC_WIDGET
+    elif [[ $rchar == " " ]]; then
+        zle ${AUTOPAIR_SPC_WIDGET:-self-insert}
     else
         zle self-insert
     fi
@@ -176,8 +177,8 @@ autopair-close() {
 }
 
 autopair-delete() {
-    _ap-can-delete-p && zle .delete-char
-    zle backward-delete-char
+    _ap-can-delete-p && RBUFFER=${RBUFFER:1}
+    zle ${AUTOPAIR_BKSPC_WIDGET:-backward-delete-char}
 }
 
 
