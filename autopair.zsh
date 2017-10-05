@@ -2,9 +2,8 @@
 
 AUTOPAIR_INHIBIT_INIT=${AUTOPAIR_INHIBIT_INIT:-}
 AUTOPAIR_BETWEEN_WHITESPACE=${AUTOPAIR_BETWEEN_WHITESPACE:-}
-AUTOPAIR_SPC_WIDGET=${AUTOPAIR_SPC_WIDGET:-$(bindkey " " | cut -c5-)}
-AUTOPAIR_BKSPC_WIDGET=${AUTOPAIR_BKSPC_WIDGET:-$(bindkey "^?" | cut -c5-)}
 
+typeset -gA AUTOPAIR_FALLBACKS
 typeset -gA AUTOPAIR_PAIRS
 AUTOPAIR_PAIRS=('`' '`' "'" "'" '"' '"' '{' '}' '[' ']' '(' ')' ' ' ' ')
 
@@ -117,14 +116,16 @@ _ap-can-pair-p() {
 
     # Don't pair when in front of characters that likely signify the start of a
     # string, path or undesirable boundary.
-    _ap-next-to-boundary-p $KEYS $rchar && return 1
+    _ap-next-to-boundary-p $KEYS && return 1
 
     return 0
 }
 
 # Return 0 if the adjacent character (on the right) can be safely skipped over.
 _ap-can-skip-p() {
-    if [[ $1 == $2 ]]; then
+    if [[ -z $LBUFFER ]]; then
+        return 1
+    elif [[ $1 == $2 ]]; then
         if [[ $1 == " " ]]; then
             return 1
         elif ! _ap-balanced-p $1 $2; then
@@ -146,10 +147,17 @@ _ap-can-delete-p() {
     return 0
 }
 
-# Insert $1 and add $2 after the cursor
-_ap-self-insert() {
-    LBUFFER+=$1
-    RBUFFER="$2$RBUFFER"
+# Bind a key
+_ap-bind() {
+    local fallback=${3:-$(bindkey "$1" | cut -c5-)}
+    AUTOPAIR_FALLBACKS+=($1 ${fallback:-self-insert})
+    bindkey "$1" $2
+    bindkey -M isearch "$1" ${fallback:-self-insert}
+}
+
+# Run the fallback which for the current key
+_ap-zle() {
+    zle ${AUTOPAIR_FALLBACKS[$1]:-${2:-self-insert}}
 }
 
 
@@ -160,11 +168,10 @@ autopair-insert() {
     if [[ $KEYS == (\'|\"|\`| ) ]] && _ap-can-skip-p $KEYS $rchar; then
         zle forward-char
     elif _ap-can-pair-p; then
-        _ap-self-insert $KEYS $rchar
-    elif [[ $rchar == " " ]]; then
-        zle ${AUTOPAIR_SPC_WIDGET:-self-insert}
+        _ap-zle $KEYS
+        RBUFFER="$rchar$RBUFFER"
     else
-        zle self-insert
+        _ap-zle $KEYS
     fi
 }
 
@@ -172,38 +179,33 @@ autopair-close() {
     if _ap-can-skip-p $(_ap-get-pair "" $KEYS) $KEYS; then
         zle forward-char
     else
-        zle self-insert
+        _ap-zle $KEYS
     fi
 }
 
 autopair-delete() {
     _ap-can-delete-p && RBUFFER=${RBUFFER:1}
-    zle ${AUTOPAIR_BKSPC_WIDGET:-backward-delete-char}
+    _ap-zle $KEYS backward-delete-char
 }
 
 
 ### Initialization #####################
 
+zle -N autopair-insert
+zle -N autopair-close
+zle -N autopair-delete
 autopair-init() {
-    zle -N autopair-insert
-    zle -N autopair-close
-    zle -N autopair-delete
-
     local p
     for p in ${(@k)AUTOPAIR_PAIRS}; do
-        bindkey "$p" autopair-insert
-        bindkey -M isearch "$p" self-insert
+        _ap-bind "$p" autopair-insert
 
         local rchar=$(_ap-get-pair $p)
         if [[ $p != $rchar ]]; then
-            bindkey "$rchar" autopair-close
-            bindkey -M isearch "$rchar" self-insert
+            _ap-bind "$rchar" autopair-close
         fi
     done
 
-    bindkey "^?" autopair-delete
-    bindkey "^h" autopair-delete
-    bindkey -M isearch "^?" backward-delete-char
-    bindkey -M isearch "^h" backward-delete-char
+    _ap-bind "^?" autopair-delete backward-delete-char
+    _ap-bind "^H" autopair-delete backward-delete-char
 }
 [[ $AUTOPAIR_INHIBIT_INIT ]] || autopair-init
