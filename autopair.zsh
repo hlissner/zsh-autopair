@@ -97,7 +97,7 @@ _ap-balanced-p() {
 
 # Return 0 if the last keypress can be auto-paired.
 _ap-can-pair-p() {
-    local rchar=$(_ap-get-pair $KEYS)
+    local rchar="$(_ap-get-pair $KEYS)"
 
     [[ $rchar ]] || return 1
 
@@ -142,7 +142,7 @@ _ap-can-skip-p() {
 # Return 0 if the adjacent character (on the right) can be safely deleted.
 _ap-can-delete-p() {
     local lchar="$LBUFFER[-1]"
-    local rchar=$(_ap-get-pair $lchar)
+    local rchar="$(_ap-get-pair $lchar)"
     ! [[ $rchar && $RBUFFER[1] == $rchar ]] && return 1
     [[ $lchar == $rchar ]] && ! _ap-balanced-p $lchar $rchar && return 1
     return 0
@@ -158,7 +158,7 @@ _ap-self-insert() {
 ### Widgets ############################
 
 autopair-insert() {
-    local rchar=$(_ap-get-pair $KEYS)
+    local rchar="$(_ap-get-pair $KEYS)"
     if [[ $KEYS == (\'|\"|\`| ) ]] && _ap-can-skip-p $KEYS $rchar; then
         zle forward-char
     elif _ap-can-pair-p; then
@@ -171,7 +171,7 @@ autopair-insert() {
 }
 
 autopair-close() {
-    if _ap-can-skip-p $(_ap-get-pair "" $KEYS) $KEYS; then
+    if _ap-can-skip-p "$(_ap-get-pair "" $KEYS)" $KEYS; then
         zle forward-char
     else
         zle self-insert
@@ -196,7 +196,7 @@ autopair-init() {
         bindkey "$p" autopair-insert
         bindkey -M isearch "$p" self-insert
 
-        local rchar=$(_ap-get-pair $p)
+        local rchar="$(_ap-get-pair $p)"
         if [[ $p != $rchar ]]; then
             bindkey "$rchar" autopair-close
             bindkey -M isearch "$rchar" self-insert
