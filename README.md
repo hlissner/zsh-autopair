@@ -1,5 +1,5 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](./LICENSE)
-![ZSH 5.0.2](https://img.shields.io/badge/zsh-v5.0.2-orange.svg?style=flat-square)
+![ZSH 5.0.2+](https://img.shields.io/badge/zsh-v5.0.2-orange.svg?style=flat-square)
 [![Build Status](https://img.shields.io/travis/hlissner/zsh-autopair/master.svg?label=master&style=flat-square)](https://travis-ci.org/hlissner/zsh-autopair)
 
 # zsh-autopair
