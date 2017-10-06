@@ -124,7 +124,9 @@ _ap-can-pair-p() {
 
 # Return 0 if the adjacent character (on the right) can be safely skipped over.
 _ap-can-skip-p() {
-    if [[ $1 == $2 ]]; then
+    if [[ -z $LBUFFER ]]; then
+        return 1
+    elif [[ $1 == $2 ]]; then
         if [[ $1 == " " ]]; then
             return 1
         elif ! _ap-balanced-p $1 $2; then
