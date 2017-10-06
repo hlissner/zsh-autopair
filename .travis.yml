@@ -23,7 +23,7 @@ before_install:
     - make
     - make install
     - cd -
-    - export PATH="$LOCAL/bin:$PATH"
+    - export PATH="$LOCAL/bin:$HOME/bin:$PATH"
 
 before_script:
     - mkdir -p ~/bin
