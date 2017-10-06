@@ -2,9 +2,8 @@
 
 AUTOPAIR_INHIBIT_INIT=${AUTOPAIR_INHIBIT_INIT:-}
 AUTOPAIR_BETWEEN_WHITESPACE=${AUTOPAIR_BETWEEN_WHITESPACE:-}
-AUTOPAIR_SPC_WIDGET=${AUTOPAIR_SPC_WIDGET:-"$(bindkey " " | cut -c5-)"}
-AUTOPAIR_BKSPC_WIDGET=${AUTOPAIR_BKSPC_WIDGET:-"$(bindkey "^?" | cut -c6-)"}
 
+typeset -gA AUTOPAIR_FALLBACKS
 typeset -gA AUTOPAIR_PAIRS
 AUTOPAIR_PAIRS=('`' '`' "'" "'" '"' '"' '{' '}' '[' ']' '(' ')' ' ' ' ')
 
@@ -148,10 +147,18 @@ _ap-can-delete-p() {
     return 0
 }
 
-# Insert $1 and add $2 after the cursor
-_ap-self-insert() {
-    LBUFFER+=$1
-    RBUFFER="$2$RBUFFER"
+# Bind a key
+_ap-bind() {
+    local fallback=${3:-"$(bindkey "$1")"}
+    fallback=${fallback##*\" }
+    fallback=${fallback:-self-insert}
+    AUTOPAIR_FALLBACKS+=($1 $fallback)
+    bindkey "$1" $2
+    bindkey -M isearch "$1" $fallback
+}
+
+_ap-zle() {
+    zle ${AUTOPAIR_FALLBACKS[$1]:-${2:-self-insert}}
 }
 
 
@@ -162,11 +169,10 @@ autopair-insert() {
     if [[ $KEYS == (\'|\"|\`| ) ]] && _ap-can-skip-p $KEYS $rchar; then
         zle forward-char
     elif _ap-can-pair-p; then
-        _ap-self-insert $KEYS $rchar
-    elif [[ $rchar == " " ]]; then
-        zle ${AUTOPAIR_SPC_WIDGET:-self-insert}
+        _ap-zle $KEYS
+        RBUFFER="$rchar$RBUFFER"
     else
-        zle self-insert
+        _ap-zle $KEYS
     fi
 }
 
@@ -174,13 +180,13 @@ autopair-close() {
     if _ap-can-skip-p "$(_ap-get-pair "" $KEYS)" $KEYS; then
         zle forward-char
     else
-        zle self-insert
+        _ap-zle $KEYS
     fi
 }
 
 autopair-delete() {
     _ap-can-delete-p && RBUFFER=${RBUFFER:1}
-    zle ${AUTOPAIR_BKSPC_WIDGET:-backward-delete-char}
+    _ap-zle $KEYS backward-delete-char
 }
 
 
@@ -193,19 +199,15 @@ autopair-init() {
 
     local p
     for p in ${(@k)AUTOPAIR_PAIRS}; do
-        bindkey "$p" autopair-insert
-        bindkey -M isearch "$p" self-insert
+        _ap-bind "$p" autopair-insert
 
         local rchar="$(_ap-get-pair $p)"
         if [[ $p != $rchar ]]; then
-            bindkey "$rchar" autopair-close
-            bindkey -M isearch "$rchar" self-insert
+            _ap-bind "$rchar" autopair-close
         fi
     done
 
-    bindkey "^?" autopair-delete
-    bindkey "^h" autopair-delete
-    bindkey -M isearch "^?" backward-delete-char
-    bindkey -M isearch "^h" backward-delete-char
+    _ap-bind "^?" autopair-delete backward-delete-char
+    _ap-bind "^H" autopair-delete backward-delete-char
 }
 [[ $AUTOPAIR_INHIBIT_INIT ]] || autopair-init
