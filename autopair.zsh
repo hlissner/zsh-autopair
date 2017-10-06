@@ -96,20 +96,20 @@ _ap-balanced-p() {
 
 # Return 0 if the last keypress can be auto-paired.
 _ap-can-pair-p() {
-    local rchar=$(_ap-get-pair $KEYS)
+    local rchar="$(_ap-get-pair $KEYS)"
 
     [[ $rchar ]] || return 1
 
-    if [[ $rchar != " " ]]; then
+    if [[ $rchar != ' ' ]]; then
         # Force pair if surrounded by space/[BE]OL, regardless of
         # boundaries/balance
         [[ $AUTOPAIR_BETWEEN_WHITESPACE && \
-            $LBUFFER =~ "(^|[ 	])$" && \
-            $RBUFFER =~ "^($|[ 	])" ]] && return 0
+            $LBUFFER =~ '(^|[ 	])$' && \
+            $RBUFFER =~ '^($|[ 	])' ]] && return 0
 
         # Don't pair quotes if the delimiters are unbalanced
         ! _ap-balanced-p $KEYS $rchar && return 1
-    elif [[ $RBUFFER =~ "^[ 	]*$" ]]; then
+    elif [[ $RBUFFER =~ '^[ 	]*$' ]]; then
         # Don't pair spaces surrounded by whitespace
         return 1
     fi
@@ -126,7 +126,7 @@ _ap-can-skip-p() {
     if [[ -z $LBUFFER ]]; then
         return 1
     elif [[ $1 == $2 ]]; then
-        if [[ $1 == " " ]]; then
+        if [[ $1 == ' ' ]]; then
             return 1
         elif ! _ap-balanced-p $1 $2; then
             return 1
@@ -140,8 +140,8 @@ _ap-can-skip-p() {
 
 # Return 0 if the adjacent character (on the right) can be safely deleted.
 _ap-can-delete-p() {
-    local lchar="$LBUFFER[-1]"
-    local rchar=$(_ap-get-pair $lchar)
+    local lchar="${LBUFFER[-1]}"
+    local rchar="$(_ap-get-pair $lchar)"
     ! [[ $rchar && $RBUFFER[1] == $rchar ]] && return 1
     [[ $lchar == $rchar ]] && ! _ap-balanced-p $lchar $rchar && return 1
     return 0
@@ -149,7 +149,7 @@ _ap-can-delete-p() {
 
 # Bind a key
 _ap-bind() {
-    local fallback=${3:-$(bindkey "$1" | cut -c5-)}
+    local fallback=${3:-"$(bindkey "$1" | cut -c5-)"}
     AUTOPAIR_FALLBACKS+=($1 ${fallback:-self-insert})
     bindkey "$1" $2
     bindkey -M isearch "$1" ${fallback:-self-insert}
@@ -157,14 +157,14 @@ _ap-bind() {
 
 # Run the fallback which for the current key
 _ap-zle() {
-    zle ${AUTOPAIR_FALLBACKS[$1]:-${2:-self-insert}}
+    zle ${AUTOPAIR_FALLBACKS[${1:-_}]:-${2:-self-insert}}
 }
 
 
 ### Widgets ############################
 
 autopair-insert() {
-    local rchar=$(_ap-get-pair $KEYS)
+    local rchar="$(_ap-get-pair $KEYS)"
     if [[ $KEYS == (\'|\"|\`| ) ]] && _ap-can-skip-p $KEYS $rchar; then
         zle forward-char
     elif _ap-can-pair-p; then
@@ -176,7 +176,7 @@ autopair-insert() {
 }
 
 autopair-close() {
-    if _ap-can-skip-p $(_ap-get-pair "" $KEYS) $KEYS; then
+    if _ap-can-skip-p "$(_ap-get-pair "" $KEYS)" $KEYS; then
         zle forward-char
     else
         _ap-zle $KEYS
@@ -197,11 +197,11 @@ zle -N autopair-delete
 autopair-init() {
     local p
     for p in ${(@k)AUTOPAIR_PAIRS}; do
-        _ap-bind "$p" autopair-insert
+        _ap-bind $p autopair-insert
 
-        local rchar=$(_ap-get-pair $p)
+        local rchar="$(_ap-get-pair $p)"
         if [[ $p != $rchar ]]; then
-            _ap-bind "$rchar" autopair-close
+            _ap-bind $rchar autopair-close
         fi
     done
 
