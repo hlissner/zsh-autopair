@@ -72,7 +72,7 @@ fi
 ### zplug
 Load autopair _after compinit_, otherwise, the plugin won't work.
 ```bash
-zplug "hlissner/zsh-autopair", nice:10
+zplug "hlissner/zsh-autopair", defer:2
 ```
 
 
