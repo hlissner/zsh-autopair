@@ -144,7 +144,14 @@ _ap-can-delete-p() {
     local lchar="$LBUFFER[-1]"
     local rchar="$(_ap-get-pair $lchar)"
     ! [[ $rchar && $RBUFFER[1] == $rchar ]] && return 1
-    [[ $lchar == $rchar ]] && ! _ap-balanced-p $lchar $rchar && return 1
+    if [[ $lchar == $rchar ]]; then
+        if [[ $lchar == ' ' && ( $LBUFFER =~ "[^{([] +$" || $RBUFFER =~ "^ +[^]})]" ) ]]; then
+            # Don't collapse spaces unless in delimiters
+            return 1
+        elif ! _ap-balanced-p $lchar $rchar; then
+            return 1
+        fi
+    fi
     return 0
 }
 
