@@ -55,7 +55,7 @@ Specifically, zsh-autopair does 5 things for you:
 Download and source `autopair.zsh`
 
 ### Antigen
-`antigen-bundle hlissner/zsh-autopair`
+`antigen bundle hlissner/zsh-autopair`
 
 ### zgen
 ```
