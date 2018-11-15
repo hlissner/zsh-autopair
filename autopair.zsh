@@ -28,9 +28,9 @@ AUTOPAIR_RBOUNDS+=(braces '')
 
 # Returns the other pair for $1 (a char), blank otherwise
 _ap-get-pair() {
-    if [[ $1 ]]; then
+    if [[ -n $1 ]]; then
         echo $AUTOPAIR_PAIRS[$1]
-    elif [[ $2 ]]; then
+    elif [[ -n $2 ]]; then
         local i
         for i in ${(@k)AUTOPAIR_PAIRS}; do
             [[ $2 == $AUTOPAIR_PAIRS[$i] ]] && echo $i && break
@@ -40,7 +40,7 @@ _ap-get-pair() {
 
 # Return 0 if cursor's surroundings match either regexp: $1 (left) or $2 (right)
 _ap-boundary-p() {
-    [[ $1 && $LBUFFER =~ "$1$" ]] || [[ $2 && $RBUFFER =~ "^$2" ]]
+    [[ -n $1 && $LBUFFER =~ "$1$" ]] || [[ -n $2 && $RBUFFER =~ "^$2" ]]
 }
 
 # Return 0 if the surrounding text matches any of the AUTOPAIR_*BOUNDS regexps
@@ -99,12 +99,12 @@ _ap-balanced-p() {
 _ap-can-pair-p() {
     local rchar="$(_ap-get-pair $KEYS)"
 
-    [[ $rchar ]] || return 1
+    [[ -n $rchar ]] || return 1
 
     if [[ $rchar != " " ]]; then
         # Force pair if surrounded by space/[BE]OL, regardless of
         # boundaries/balance
-        [[ $AUTOPAIR_BETWEEN_WHITESPACE && \
+        [[ -n $AUTOPAIR_BETWEEN_WHITESPACE && \
             $LBUFFER =~ "(^|[ 	])$" && \
             $RBUFFER =~ "^($|[ 	])" ]] && return 0
 
@@ -133,7 +133,7 @@ _ap-can-skip-p() {
             return 1
         fi
     fi
-    if ! [[ $2 && $RBUFFER[1] == $2 && $LBUFFER[-1] != '\' ]]; then
+    if ! [[ -n $2 && $RBUFFER[1] == $2 && $LBUFFER[-1] != '\' ]]; then
         return 1
     fi
     return 0
@@ -143,7 +143,7 @@ _ap-can-skip-p() {
 _ap-can-delete-p() {
     local lchar="$LBUFFER[-1]"
     local rchar="$(_ap-get-pair $lchar)"
-    ! [[ $rchar && $RBUFFER[1] == $rchar ]] && return 1
+    ! [[ -n $rchar && $RBUFFER[1] == $rchar ]] && return 1
     [[ $lchar == $rchar ]] && ! _ap-balanced-p $lchar $rchar && return 1
     return 0
 }
@@ -208,4 +208,4 @@ autopair-init() {
     bindkey -M isearch "^?" backward-delete-char
     bindkey -M isearch "^h" backward-delete-char
 }
-[[ $AUTOPAIR_INHIBIT_INIT ]] || autopair-init
+[[ -n $AUTOPAIR_INHIBIT_INIT ]] || autopair-init
