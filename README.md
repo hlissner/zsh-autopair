@@ -55,11 +55,20 @@ Specifically, zsh-autopair does 5 things for you:
 ## Install
 Download and source `autopair.zsh`
 
+```bash
+if [[ ! -d ~/.zsh-autopair ]]; then
+  git clone https://github.com/hlissner/zsh-autopair ~/.zsh-autopair
+fi
+
+source ~/.zsh-autopair/autopair.zsh
+autopair-init
+```
+
 ### Antigen
 `antigen bundle hlissner/zsh-autopair`
 
 ### zgen
-```
+```bash
 if ! zgen saved; then
     echo "Creating a zgen save"
 
