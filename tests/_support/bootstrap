@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+source autopair.zsh
+export KEYS=
+export LBUFFER=
+export RBUFFER=
+
+assert_true() {
+    run $@
+    assert $state equals 0
+}
+
+assert_false() {
+    run $@
+    assert $state equals 1
+}
