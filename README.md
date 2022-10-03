@@ -205,7 +205,7 @@ Disable space expansion to work around this: `unset 'AUTOPAIR_PAIRS[ ]'`
 [dotfiles]: https://github.com/hlissner/dotfiles
 [vimrc]: https://github.com/hlissner/.vim
 [emacs.d]: https://github.com/hlissner/doom-emacs
-[zshrc]: https://github.com/hlissner/dotfiles/tree/master/shell/%2Bzsh
+[zshrc]: https://github.com/hlissner/dotfiles/blob/master/config/zsh/.zshrc
 [zsh-syntax-highlighting]: https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters/pattern.md
 [surround]: https://github.com/zsh-users/zsh/blob/master/Functions/Zle/surround
 [select-quoted]: https://github.com/zsh-users/zsh/blob/master/Functions/Zle/select-quoted
