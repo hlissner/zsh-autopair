@@ -86,6 +86,11 @@ Load autopair _after compinit_, otherwise, the plugin won't work.
 zplug "hlissner/zsh-autopair", defer:2
 ```
 
+### [Homebrew]
+```bash
+brew install zsh-autopair
+echo "source $(brew --prefix)/share/zsh-autopair/autopair.zsh" >> ~/.zshrc
+```
 
 ## Configuration
 zsh-autopair sets itself up. You can prevent this by setting
@@ -210,3 +215,4 @@ Disable space expansion to work around this: `unset 'AUTOPAIR_PAIRS[ ]'`
 [surround]: https://github.com/zsh-users/zsh/blob/master/Functions/Zle/surround
 [select-quoted]: https://github.com/zsh-users/zsh/blob/master/Functions/Zle/select-quoted
 [select-bracketed]: https://github.com/zsh-users/zsh/blob/master/Functions/Zle/select-bracketed
+[Homebrew]: https://brew.sh
