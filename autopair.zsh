@@ -4,6 +4,7 @@ AUTOPAIR_INHIBIT_INIT=${AUTOPAIR_INHIBIT_INIT:-}
 AUTOPAIR_BETWEEN_WHITESPACE=${AUTOPAIR_BETWEEN_WHITESPACE:-}
 AUTOPAIR_SPC_WIDGET=${AUTOPAIR_SPC_WIDGET:-"$(bindkey " " | cut -c5-)"}
 AUTOPAIR_BKSPC_WIDGET=${AUTOPAIR_BKSPC_WIDGET:-"$(bindkey "^?" | cut -c6-)"}
+AUTOPAIR_DELWORD_WIDGET=${AUTOPAIR_DELWORD_WIDGET:-"$(bindkey "^w" | cut -c6-)"}
 
 typeset -gA AUTOPAIR_PAIRS
 AUTOPAIR_PAIRS=('`' '`' "'" "'" '"' '"' '{' '}' '[' ']' '(' ')' ' ' ' ')
@@ -190,6 +191,11 @@ autopair-delete() {
     zle ${AUTOPAIR_BKSPC_WIDGET:-backward-delete-char}
 }
 
+autopair-delete-word() {
+    _ap-can-delete-p && RBUFFER=${RBUFFER:1}
+    zle ${AUTOPAIR_DELWORD_WIDGET:-backward-delete-word}
+}
+
 
 ### Initialization #####################
 
@@ -197,6 +203,7 @@ autopair-init() {
     zle -N autopair-insert
     zle -N autopair-close
     zle -N autopair-delete
+    zle -N autopair-delete-word
 
     local p
     for p in ${(@k)AUTOPAIR_PAIRS}; do
@@ -212,7 +219,9 @@ autopair-init() {
 
     bindkey "^?" autopair-delete
     bindkey "^h" autopair-delete
+    bindkey "^w" autopair-delete-word
     bindkey -M isearch "^?" backward-delete-char
     bindkey -M isearch "^h" backward-delete-char
+    bindkey -M isearch "^w" backward-delete-word
 }
 [[ -n $AUTOPAIR_INHIBIT_INIT ]] || autopair-init
