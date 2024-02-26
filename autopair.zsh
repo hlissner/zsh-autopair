@@ -29,11 +29,11 @@ AUTOPAIR_RBOUNDS+=(braces '')
 # Returns the other pair for $1 (a char), blank otherwise
 _ap-get-pair() {
     if [[ -n $1 ]]; then
-        echo $AUTOPAIR_PAIRS[$1]
+        echo ${AUTOPAIR_PAIRS[$1]}
     elif [[ -n $2 ]]; then
         local i
         for i in ${(@k)AUTOPAIR_PAIRS}; do
-            [[ $2 == $AUTOPAIR_PAIRS[$i] ]] && echo $i && break
+            [[ $2 == ${AUTOPAIR_PAIRS[$i]} ]] && echo $i && break
         done
     fi
 }
@@ -55,7 +55,7 @@ _ap-next-to-boundary-p() {
     groups+=$1
     local group
     for group in $groups; do
-        _ap-boundary-p $AUTOPAIR_LBOUNDS[$group] $AUTOPAIR_RBOUNDS[$group] && return 0
+        _ap-boundary-p ${AUTOPAIR_LBOUNDS[$group]} ${AUTOPAIR_RBOUNDS[$group]} && return 0
     done
     return 1
 }
@@ -133,7 +133,7 @@ _ap-can-skip-p() {
             return 1
         fi
     fi
-    if ! [[ -n $2 && $RBUFFER[1] == $2 && $LBUFFER[-1] != '\' ]]; then
+    if ! [[ -n $2 && ${RBUFFER[1]} == $2 && ${LBUFFER[-1]} != '\' ]]; then
         return 1
     fi
     return 0
@@ -141,9 +141,9 @@ _ap-can-skip-p() {
 
 # Return 0 if the adjacent character (on the right) can be safely deleted.
 _ap-can-delete-p() {
-    local lchar="$LBUFFER[-1]"
+    local lchar="${LBUFFER[-1]}"
     local rchar="$(_ap-get-pair $lchar)"
-    ! [[ -n $rchar && $RBUFFER[1] == $rchar ]] && return 1
+    ! [[ -n $rchar && ${RBUFFER[1]} == $rchar ]] && return 1
     if [[ $lchar == $rchar ]]; then
         if [[ $lchar == ' ' && ( $LBUFFER =~ "[^{([] +$" || $RBUFFER =~ "^ +[^]})]" ) ]]; then
             # Don't collapse spaces unless in delimiters
