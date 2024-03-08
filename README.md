@@ -42,6 +42,7 @@ Specifically, zsh-autopair does 5 things for you:
     - [Antigen](#antigen)
     - [zgen](#zgen)
     - [zplug](#zplug)
+    - [Hombrew](#homebrew)
 - [Configuration](#configuration)
     - [Adding/Removing pairs](#addingremoving-pairs)
 - [Troubleshooting & compatibility issues](#troubleshooting--compatibility-issues)
@@ -84,6 +85,16 @@ fi
 Load autopair _after compinit_, otherwise, the plugin won't work.
 ```bash
 zplug "hlissner/zsh-autopair", defer:2
+```
+
+### Homebrew
+For Homebrew users, you can install it through the following command
+```shell
+brew install zsh-autopair
+```
+Then source it in your `.zshrc`
+```shell
+source $(brew --prefix)/share/zsh-autopair/autopair.zsh
 ```
 
 
