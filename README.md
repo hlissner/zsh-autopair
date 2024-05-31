@@ -43,6 +43,7 @@ Specifically, zsh-autopair does 5 things for you:
     - [zgen](#zgen)
     - [zplug](#zplug)
     - [Hombrew](#homebrew)
+    - [Oh My Zsh](#oh-my-zsh)
 - [Configuration](#configuration)
     - [Adding/Removing pairs](#addingremoving-pairs)
 - [Troubleshooting & compatibility issues](#troubleshooting--compatibility-issues)
@@ -97,6 +98,23 @@ Then source it in your `.zshrc`
 source $(brew --prefix)/share/zsh-autopair/autopair.zsh
 ```
 
+### Oh My Zsh
+1. Clone this repository into `$ZSH_CUSTOM/plugins` (by default `~/.oh-my-zsh/custom/plugins`)
+
+    ```sh
+    git clone https://github.com/hlissner/zsh-autopair ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autopair
+    ```
+
+2. Add the plugin to the list of plugins for Oh My Zsh to load (inside `~/.zshrc`):
+
+    ```sh
+    plugins=(
+        # other plugins...
+        zsh-autopair
+    )
+    ```
+
+3. Start a new terminal session.
 
 ## Configuration
 zsh-autopair sets itself up. You can prevent this by setting
