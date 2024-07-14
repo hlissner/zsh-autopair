@@ -67,6 +67,14 @@ source ~/.zsh-autopair/autopair.zsh
 autopair-init
 ```
 
+### Hoembrew
+`brew install zsh-autopair`
+
+``` bash
+# Add to .zshrc
+source $HOMEBREW_PREFIX/share/zsh-autopair/autopair.zsh
+```
+
 ### Antigen
 `antigen bundle hlissner/zsh-autopair`
 
